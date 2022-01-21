@@ -1,22 +1,27 @@
 <template>
     <div class="login flex items-center h-screen flex-wrap content-center p-5">
-        <p class="italic text-center mb-5 font-bold text-2xl w-full text-gray-600">俄罗斯方块 Online</p>
+        <p class="italic text-center mb-5 font-bold text-2xl w-full text-gray-600">
+            <span>俄罗斯方块</span>
+            <van-badge content="Beta" :offset="[10, 5]">
+                <span> Online</span>
+            </van-badge>
+        </p>
         <form class="flex w-full space-x-3">
             <input v-model="username"
                 class="flex-1 appearance-none border border-transparent w-full py-2 px-4 bg-white text-gray-700 placeholder-gray-400 shadow-md rounded-lg text-base focus:outline-none focus:ring-2 focus:ring-purple-600 focus:border-transparent"
-                placeholder="请输入用户名" @keydown.enter="onLogin">
+                placeholder="阁下尊姓大名？" @keydown.enter="onLogin">
         </form>
 
         <div class="mt-2 grid grid-cols-2 w-full gap-2">
             <button
-                class="flex-shrink-0 bg-yellow-500 text-white text-sm font-semibold py-2 px-4 rounded-lg shadow-md hover:bg-yellow-700 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2 focus:ring-offset-purple-200"
+                class="flex-shrink-0 bg-yellow-400 text-white text-sm font-bold py-2 px-4 rounded-lg shadow-md hover:bg-yellow-700 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2 focus:ring-offset-purple-200"
                 type="button" @click="onPersonal">
-                个人练习
+                个人磨练
             </button>
             <button
-                class="flex-shrink-0 bg-purple-600 text-white text-sm font-semibold py-2 px-4 rounded-lg shadow-md hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 focus:ring-offset-purple-200"
+                class="flex-shrink-0 bg-indigo-600 text-white text-sm py-2 px-4 rounded-lg shadow-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-indigo-200 font-bold"
                 type="button" @click="onLogin">
-                联网对战
+                进入江湖
             </button>
         </div>
     </div>
@@ -26,12 +31,16 @@
     import { defineComponent, onMounted, reactive, toRaw, toRefs } from 'vue'
     import { useStore } from 'vuex'
     import { useRouter } from 'vue-router'
-    import { Toast } from 'vant'
+    import { Toast, Badge } from 'vant'
+
     import { wsClient as $wsClient } from '@/utils/websocket'
     import { loading } from '@/utils/common'
 
     export default defineComponent({
         name: 'page-login',
+        components: {
+            [Badge.name]: Badge
+        },
         setup() {
             const $store = useStore()
             const $router = useRouter()
@@ -43,6 +52,8 @@
             onMounted(() => {
                 // 读取历时用户名
                 state.username = localStorage.getInfo()
+
+                autoLogin();
             })
 
             // 会话存储
@@ -55,6 +66,16 @@
                 }
             }
 
+            // 自动登录
+            const autoLogin = () => {
+                const sessionUsername = window.sessionStorage.getItem('session.username') || '';
+                if (!sessionUsername) {
+                    return true;
+                }
+
+                submitLogin(sessionUsername);
+            }
+
             // 提交登录
             const submitLogin = (username) => {
                 username = username.trim()
@@ -63,7 +84,7 @@
                 }
 
                 loading()
-                $wsClient.socket('/game').emit('login', {
+                $wsClient.socket('/user').emit('login', {
                     username
                 }, (data) => {
                     if (!data['success']) {

@@ -45,12 +45,6 @@ router.afterEach(async (to, from) => {
 router.beforeEach((to, from, next) => {
     // 未登录
     if (!$store.state.userSession.username) {
-        const sessionUsername = window.sessionStorage.getItem('session.username', '')
-        if (sessionUsername) {
-            $store.commit('setSessionUsername', sessionUsername)
-            return next({ name: 'hall' })
-        }
-
         if (to.name !== 'login') {
             return next({ name: 'login' })
         } else {

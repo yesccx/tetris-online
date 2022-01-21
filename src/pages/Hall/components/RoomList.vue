@@ -9,7 +9,7 @@
         </div>
 
         <div class="text-center">
-            <p v-show="roomList.length === 0 && !roomListLoading" class="empty-tip">暂无房间～</p>
+            <van-empty v-show="roomList.length === 0 && !roomListLoading" description="暂无房间～" />
         </div>
 
         <van-loading v-show="roomListLoading" color="#1989fa" size="24" vertical>加载中...</van-loading>
@@ -20,14 +20,15 @@
     import { computed, defineComponent, onMounted, onUnmounted, reactive, toRefs, watch } from 'vue'
     import { useStore } from 'vuex'
 
-    import { Loading, Toast } from 'vant';
+    import { Loading, Toast, Empty } from 'vant';
 
     import { wsClient as $wsClient } from '@/utils/websocket'
     import { loading, unloading } from '@/utils/common'
 
     export default defineComponent({
         components: {
-            [Loading.name]: Loading
+            [Loading.name]: Loading,
+            [Empty.name]: Empty
         },
         setup() {
             const $store = useStore()
@@ -109,7 +110,8 @@
 <style lang="less" scoped>
     .room-list {
         @apply space-y-4 bg-white rounded-md;
-        min-height: 90vh;
+        overflow-y: auto;
+        height: calc(100vh - 100px);
 
         .room-wrapper {
             @apply w-full block rounded-md text-white font-extrabold text-center bg-blue-500 p-6 divide-y-2 divide-gray-300 divide-solid;

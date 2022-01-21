@@ -59,10 +59,14 @@
 
             // 事件: 退出登录
             const onLogout = () => {
-                $store.commit('setSessionUsername', '');
+                $wsClient.socket('/user').emit('logout', (data) => {
+                    if (!data['success']) {
+                        return Toast.fail(data['message'] || '退出登录失败');
+                    }
 
-                // TODO: 调用退出登录接口
-                $router.push({ name: 'login' })
+                    $store.commit('setSessionUsername', '');
+                    $router.push({ name: 'login' })
+                });
             }
 
             return {
@@ -75,11 +79,11 @@
 
 <style lang="less" scoped>
     .action-bar {
-        @apply sticky bottom-0 mt-4 p-4 bg-gray-100 inline-flex justify-between flex-1;
-        width: 50%;
+        @apply fixed bottom-0 mt-4 p-4 bg-gray-100 inline-flex justify-between flex-1;
+        width: 100%;
 
         .create {
-            @apply flex-1 mr-3 flex-shrink-0 bg-indigo-500 text-white text-sm py-2 px-4 rounded-lg shadow-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-indigo-200 font-bold;
+            @apply flex-1 mr-3 flex-shrink-0 bg-indigo-600 text-white text-sm py-2 px-4 rounded-lg shadow-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-indigo-200 font-bold;
         }
 
         .logout {
