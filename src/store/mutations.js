@@ -67,6 +67,20 @@ const mutations = {
     },
     key_pause(state, data) {
         state.keyboard['pause'] = data
-    }
+    },
+    setSessionUsername(state, username = '') {
+        // 暂存登录状态
+        window.sessionStorage.setItem('session.username', username)
+        state.userSession.username = username;
+    },
+    setGameRoom(state, { number = '', isOwner = false, ready = false }) {
+        if (!number) {
+            isOwner = false;
+            ready = false;
+        }
+        state.gameRoom.number = number;
+        // state.roomPlayer.isOwner = isOwner;
+        // state.roomPlayer.isReady = ready;
+    },
 }
 export default mutations

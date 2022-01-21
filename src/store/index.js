@@ -157,6 +157,16 @@ const state = {
         rotate: false,
         reset: false,
         pause: false
+    },
+
+    // 用户会话
+    userSession: {
+        username: '',
+    },
+
+    // 当前游戏房间
+    gameRoom: {
+        number: ''
     }
 }
 
