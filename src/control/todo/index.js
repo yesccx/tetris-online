@@ -3,8 +3,8 @@ import right from './right'
 import down from './down'
 import rotate from './rotate'
 import space from './space'
-import r from './r'
-import p from './p'
+import setting from './setting'
+import multifunction from './multifunction'
 
 export default {
     left,
@@ -12,6 +12,7 @@ export default {
     rotate,
     right,
     space,
-    r,
-    p
+    setting,
+    setting,
+    multifunction
 }

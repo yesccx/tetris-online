@@ -50,10 +50,8 @@
                         return Toast.fail(data['message'] || '未知错误');
                     }
 
-                    $store.commit('setGameRoom', { number: data.data.number, isOwner: true, ready: true });
-
                     // 前往房间
-                    $router.push({ name: 'room' })
+                    $router.push({ name: 'room', params: { number: data.data.number } })
                 });
             }
 

@@ -1,5 +1,5 @@
 <template>
-    <div class="login flex items-center h-screen flex-wrap content-center p-5">
+    <div class="page-login flex items-center h-screen flex-wrap content-center p-5">
         <p class="italic text-center mb-5 font-bold text-2xl w-full text-gray-600">
             <span>俄罗斯方块</span>
             <van-badge content="Beta" :offset="[10, 5]">
@@ -14,7 +14,7 @@
 
         <div class="mt-2 grid grid-cols-2 w-full gap-2">
             <button
-                class="flex-shrink-0 bg-yellow-400 text-white text-sm font-bold py-2 px-4 rounded-lg shadow-md hover:bg-yellow-700 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2 focus:ring-offset-purple-200"
+                class="flex-shrink-0 bg-yellow-500 text-white text-sm font-bold py-2 px-4 rounded-lg shadow-md hover:bg-yellow-700 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2 focus:ring-offset-purple-200"
                 type="button" @click="onPersonal">
                 个人磨练
             </button>
@@ -30,7 +30,7 @@
 <script>
     import { defineComponent, onMounted, reactive, toRaw, toRefs } from 'vue'
     import { useStore } from 'vuex'
-    import { useRouter } from 'vue-router'
+    import { useRoute, useRouter } from 'vue-router'
     import { Toast, Badge } from 'vant'
 
     import { wsClient as $wsClient } from '@/utils/websocket'
@@ -44,6 +44,7 @@
         setup() {
             const $store = useStore()
             const $router = useRouter()
+            const $route = useRoute()
 
             const state = reactive({
                 username: ''
@@ -98,7 +99,14 @@
                     $store.commit('setSessionUsername', username)
 
                     Toast.success('欢迎回来～')
-                    $router.push({ name: 'hall' })
+
+                    // 尝试回到上一页
+                    const redirect = $route.query.r;
+                    if (redirect) {
+                        $router.push(redirect);
+                    } else {
+                        $router.push({ name: 'hall' })
+                    }
                 })
             }
 
@@ -126,3 +134,10 @@
         },
     })
 </script>
+
+<style lang="less" scoped>
+    .page-login {
+        max-width: 600px;
+        margin: 0 auto;
+    }
+</style>

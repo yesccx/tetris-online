@@ -26,5 +26,8 @@ export default defineConfig({
                 assetFileNames: 'css/[name]-[hash].css'
             }
         }
+    },
+    server: {
+        host: true
     }
 })

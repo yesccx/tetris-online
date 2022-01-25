@@ -19,6 +19,7 @@
 <script>
     import { computed, defineComponent, onMounted, onUnmounted, reactive, toRefs, watch } from 'vue'
     import { useStore } from 'vuex'
+    import { useRouter } from 'vue-router';
 
     import { Loading, Toast, Empty } from 'vant';
 
@@ -32,6 +33,7 @@
         },
         setup() {
             const $store = useStore()
+            const $router = useRouter()
 
             const state = reactive({
                 // 加载状态
@@ -93,7 +95,8 @@
                         return Toast.fail(data['message'] || '未知错误');
                     }
 
-                    $store.commit('setCurrentRoom', { number: roomNumber });
+                    // 前往房间
+                    $router.push({ name: 'room', params: { number: roomNumber } })
                 });
             }
 

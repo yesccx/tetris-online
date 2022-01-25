@@ -156,7 +156,8 @@ const state = {
         right: false,
         rotate: false,
         reset: false,
-        pause: false
+        pause: false,
+        setting: false
     },
 
     // 用户会话
@@ -166,12 +167,38 @@ const state = {
 
     // 当前游戏房间
     gameRoom: {
-        number: ''
+        number: '',
+        owner: '',
+        status: 0,
+        currentCount: 0,
+        maxCount: 0,
+        blocks: [],
+    },
+    // 当前游戏房间成员
+    gameRoomMembers: [],
+    // 玩家数据
+    playerData: {
+        isOwner: false,
+        isReady: false,
+        blockIndex: 0
+    },
+
+    // 服务器连接状态
+    serverStatus: 0
+}
+
+const getters = {
+    fightPlayers(state) {
+        let players = state.gameRoomMembers
+
+        return players.filter((player) => player.username != state.userSession.username).slice(0, 3);
     }
 }
 
+
 const store = createStore({
     state,
+    getters,
     mutations
 })
 

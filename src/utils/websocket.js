@@ -1,24 +1,26 @@
 import { Manager } from 'socket.io-client'
-import { Dialog } from 'vant'
+import { Dialog, Toast } from 'vant'
+import { useStore } from 'vuex'
 
 let wsClient = null;
 const init = () => {
-    wsClient = new Manager('http://81.68.72.28:8992', {
+    const $store = useStore();
+
+    wsClient = new Manager('http://192.168.2.112:8992', {
         autoConnect: true,
         transports: ['websocket'],
         upgrade: false,
         reconnectionAttempts: 10,
+        timeout: 5000
+    })
+
+    wsClient.socket('/user').on('connect', () => {
+        console.log('服务器连接成功');
+        $store.commit('setServerStatus', 1);
     })
 
     wsClient.on('connect_error', () => {
-        Dialog.alert({
-            title: '错误',
-            message: '服务器连接异常',
-        }).then(() => {
-            window.location.reload()
-        })
-    })
-    wsClient.on('connect_timeout', () => {
+        Toast.clear()
         Dialog.alert({
             title: '错误',
             message: '服务器连接已断开',
@@ -26,8 +28,23 @@ const init = () => {
             window.location.reload()
         })
     })
+    wsClient.on('connect_timeout', () => {
+        Toast.clear()
+        Dialog.alert({
+            title: '错误',
+            message: '服务器连接超时',
+        }).then(() => {
+            window.location.reload()
+        })
+    })
     wsClient.on('reconnect', () => {
-        window.location.reload()
+        Toast.clear()
+        Dialog.alert({
+            title: '错误',
+            message: '服务器连接重置',
+        }).then(() => {
+            window.location.reload()
+        })
     })
 }
 

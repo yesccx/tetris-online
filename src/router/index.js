@@ -9,12 +9,17 @@ const router = createRouter({
     history: createWebHashHistory(),
     routes: [
         {
+            name: '/',
+            name: '/',
+            redirect: { name: 'hall' },
+        },
+        {
             name: 'login',
             path: '/login',
             meta: {
                 title: '登录'
             },
-            component: () => import('@/pages/Login/index.vue'),
+            component: () => import('@/pages/login/index.vue'),
         },
         {
             name: 'hall',
@@ -22,15 +27,15 @@ const router = createRouter({
             meta: {
                 title: '游戏大厅'
             },
-            component: () => import('@/pages/Hall/index.vue'),
+            component: () => import('@/pages/hall/index.vue'),
         },
         {
             name: 'room',
-            path: '/room',
+            path: '/room/:number',
             meta: {
                 title: '游戏房间'
             },
-            component: () => import('@/pages/Room/index.vue'),
+            component: () => import('@/pages/room/index.vue'),
         }
     ]
 })
@@ -46,20 +51,9 @@ router.beforeEach((to, from, next) => {
     // 未登录
     if (!$store.state.userSession.username) {
         if (to.name !== 'login') {
-            return next({ name: 'login' })
+            return next({ name: 'login', query: { r: to.fullPath } })
         } else {
             return next()
-        }
-    }
-
-    // 已加入房间
-    if (!$store.state.gameRoom.number) {
-        if (to.name === 'room') {
-            return next({ name: 'hall' })
-        }
-    } else {
-        if (to.name !== 'room') {
-            return next({ name: 'room' })
         }
     }
 

@@ -16,9 +16,9 @@
 <script>
     import { defineComponent, onMounted, onUnmounted, reactive, toRefs } from 'vue'
 
-    import Statistics from './components/Statistics.vue';
-    import ActionBar from './components/ActionBar.vue';
-    import RoomList from './components/RoomList.vue';
+    import Statistics from './components/statistics.vue';
+    import ActionBar from './components/action-bar.vue';
+    import RoomList from './components/room-list.vue';
 
     import { wsClient as $wsClient } from '@/utils/websocket'
 
