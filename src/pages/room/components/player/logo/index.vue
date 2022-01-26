@@ -1,52 +1,49 @@
 <template>
     <div class="logo" :style="{ display: display }">
         <div class="bg dragon" :class="className" />
-        <p class="text-white bg-red-700">玩家: 1/4 <br/> 有玩家未准备！</p>
+        <p class="text-white" :class="storeGameRoomFightReady ? 'bg-green-600' : 'bg-red-600'">
+            <span>玩家: {{ storeGameRoom.currentCount }}/{{ storeGameRoom.maxCount }}</span>
+            <br />
+            <span v-if="!storeGameRoomFightReady">有玩家未准备！</span>
+            <span v-else>准备就绪！</span>
+        </p>
     </div>
 </template>
 
 <script>
-    import { ref, watch, computed, onBeforeMount } from 'vue'
-    import { i18n, lan } from '@/utils/constant'
-    let Logo = {
-        timeout: null
-    }
+    import { computed, reactive, toRefs, watch } from 'vue'
+    import { useStore } from 'vuex';
+
     export default {
-        props: {
-            cur: {
-                default: false,
-                type: Boolean
-            },
-            reset: {
-                default: false,
-                type: Boolean
-            },
-        },
         setup(props) {
-            const className = ref('r1')
-            const display = ref('none')
-            const titleCenter = computed(() => i18n.titleCenter[lan])
+            const $store = useStore()
+            const state = reactive({
+                className: 'r1',
+                display: 'none',
+                logoTimeout: null
+            });
 
-            watch(props, (nextProps, oldProps) => {
-                animate(nextProps)
-                if (
-                    // 只有在游戏进入开始, 或结束时 触发改变
-                    ([oldProps.cur, nextProps.cur].includes(false) &&
-                        oldProps.cur !== nextProps.cur) ||
-                    oldProps.reset !== nextProps.reset
-                ) {
-                    animate(nextProps)
-                }
-            }, {
-                deep: true
-            })
+            const storePlayerData = computed(() => $store.state.playerData)
+            const storeGameRoom = computed(() => $store.state.gameRoom)
+            const storeGameRoomFightReady = computed(() => $store.getters.gameRoomFightReady)
 
-            const animate = async ({ cur, reset }) => {
-                clearTimeout(Logo.timeout)
-                className.value = 'r1'
-                display.value = 'none'
-                if (cur || reset) {
-                    display.value = 'none'
+            // 显示
+            const show = () => {
+                animate('show')
+            }
+
+            // 隐藏
+            const hidden = () => {
+                animate('hidden')
+            }
+
+            const animate = async (type) => {
+                clearTimeout(state.logoTimeout)
+                state.className = 'r1'
+                state.display = 'none'
+
+                if (type === 'hidden') {
+                    state.display = 'none'
                     return
                 }
 
@@ -55,12 +52,12 @@
 
                 const sleep = delay => {
                     return new Promise((reslove) => {
-                        Logo.timeout = setTimeout(reslove, delay)
+                        state.logoTimeout = setTimeout(reslove, delay)
                     })
                 }
 
                 const isShow = (func, value) => {
-                    display.value = value ? 'block' : 'none'
+                    state.display = value ? 'block' : 'none'
                     func && func()
                 }
 
@@ -68,9 +65,9 @@
                     // 龙在眨眼睛
                     return new Promise(async resolve => {
                         await sleep(delay1)
-                        className.value = m + 2
+                        state.className = m + 2
                         await sleep(delay2)
-                        className.value = m + 1
+                        state.className = m + 1
                         func && func()
                         return resolve()
                     })
@@ -79,9 +76,9 @@
                 const run = async func => {
                     // 开始跑步
                     await sleep(100)
-                    className.value = m + 4
+                    state.className = m + 4
                     await sleep(100)
-                    className.value = m + 3;
+                    state.className = m + 3;
                     count++
                     if (count === 10 || count === 20 || count === 30) {
                         m = m === 'r' ? 'l' : 'r'
@@ -90,7 +87,7 @@
                         run(func)
                         return
                     }
-                    className.value = m + 1
+                    state.className = m + 1
                     await sleep(4000)
                     func && func()
                 }
@@ -100,7 +97,7 @@
                     await eyes(null, 1000, 1500)
                     await eyes(null, 150, 150)
                     await eyes(() => {
-                        className.value = m + 2
+                        state.className = m + 2
                         run(dra)
                     }, 150, 150)
                 }
@@ -114,14 +111,24 @@
                 isShow(dra, true)
             }
 
-            onBeforeMount(() => {
-                animate(props)
+            // 显示准备动画
+            watch(() => $store.state.playerData.isReady, (newValue, oldValue) => {
+                if (newValue != oldValue) {
+                    if (newValue) {
+                        show()
+                    } else {
+                        hidden()
+                    }
+                }
+            }, {
+                immediate: true
             })
 
             return {
-                className,
-                display,
-                titleCenter
+                ...toRefs(state),
+                storePlayerData,
+                storeGameRoom,
+                storeGameRoomFightReady
             }
         }
     }

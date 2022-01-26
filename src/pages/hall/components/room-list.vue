@@ -66,7 +66,7 @@
             // socket监听
             const socketListen = (type = 'on') => {
                 // 房间列表更新
-                $wsClient.socket('/game')[type]('room-list-update', () => {
+                $wsClient.socket('/game')[type]('room-list-update', type == 'off' ? undefined : () => {
                     flushRoomList();
                 });
             }

@@ -3,42 +3,51 @@
 </template>
 
 <script>
+    import { reactive, toRefs, watch } from 'vue';
 
-    import { onMounted, ref, watch } from 'vue';
-    let Pause = {
-        timeout: null
-    }
     export default {
         props: {
-            data: {
+            status: {
                 type: Boolean,
-                default: false
-            }
+                default: true
+            },
+            username: {
+                type: String,
+                default: '',
+            },
         },
         setup(props) {
-            const showPause = ref(false)
-            watch(props, (newVal, _) => {
-                setShake(newVal.data)
-            })
-
-            onMounted(() => {
-                setShake(props.data)
+            const state = reactive({
+                showPause: false,
+                pauseTimeout: null
             })
 
             const setShake = (bool) => {
-                if (bool && !Pause.timeout) {
-                    Pause.timeout = setInterval(() => {
-                        showPause.value = !showPause.value
+                if (bool && !state.pauseTimeout) {
+                    state.pauseTimeout = setInterval(() => {
+                        state.showPause = !state.showPause
                     }, 250)
                 }
-                if (!bool && Pause.timeout) {
-                    clearInterval(Pause.timeout)
-                    showPause.value = false
-                    Pause.timeout = null
+                if (!bool && state.pauseTimeout) {
+                    clearInterval(state.pauseTimeout)
+                    state.showPause = false
+                    state.pauseTimeout = null
                 }
             }
+
+            watch(() => props, (newValue) => {
+                if (newValue.username) {
+                    setShake(newValue.status)
+                } else {
+                    setShake(false)
+                }
+            }, {
+                deep: true,
+                immediate: true
+            })
+
             return {
-                showPause
+                ...toRefs(state)
             }
         }
     }

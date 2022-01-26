@@ -18,10 +18,6 @@
                 },
                 type: Object
             },
-            reset: {
-                default: false,
-                type: Boolean
-            },
             propMatrix: {
                 default: () => [],
                 type: Array

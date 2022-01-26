@@ -6,10 +6,16 @@
 </template>
 
 <script>
-    import { reactive, toRefs } from 'vue'
+    import { reactive, toRefs, watch } from 'vue'
 
     export default {
-        setup() {
+        props: {
+            userReadyStatus: {
+                type: Boolean,
+                default: false
+            }
+        },
+        setup(props) {
             const state = reactive({
                 className: 'r1',
                 display: 'none',
@@ -99,6 +105,19 @@
                 await sleep(150)
                 isShow(dra, true)
             }
+
+            // 显示准备动画
+            watch(() => props.userReadyStatus, (newValue, oldValue) => {
+                if (newValue != oldValue) {
+                    if (newValue) {
+                        show()
+                    } else {
+                        hidden()
+                    }
+                }
+            }, {
+                immediate: true
+            })
 
             return {
                 ...toRefs(state),

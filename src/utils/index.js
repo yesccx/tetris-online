@@ -63,16 +63,31 @@ const utils = {
         // 游戏是否结束, 第一行落下方块为依据
         return matrix[0].some(n => !!n)
     },
-
-    subscribeRecord(store) {
-        // 将状态记录到 localStorage
-        store.subscribe((_, state) => {
-            let data = state
-            if (data.lock) {
-                // 当状态为锁定, 不记录
-                return
+    // 订阅store userSetting
+    subscribeStoreUserSetting(store) {
+        // 还原
+        let data = window.localStorage.getItem(StorageKey)
+        if (!data) {
+            return null
+        }
+        try {
+            if (window.btoa) {
+                data = atob(data)
             }
-            data = JSON.stringify(data)
+            data = decodeURIComponent(data)
+            data = JSON.parse(data)
+
+            store.state.userSetting = data
+        } catch (e) {
+            if (window.console || window.console.error) {
+                window.console.error('读取记录错误:', e)
+            }
+            return null
+        }
+
+        // 开启订阅 (保存至localStorage)
+        store.subscribe((_, state) => {
+            let data = JSON.stringify(state.userSetting)
             data = encodeURIComponent(data)
             if (window.btoa) {
                 data = btoa(data)
@@ -112,7 +127,7 @@ export const {
     want,
     isClear,
     isOver,
-    subscribeRecord,
+    subscribeStoreUserSetting,
     visibilityChangeEvent,
     isFocus
 } = utils

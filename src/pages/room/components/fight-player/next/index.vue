@@ -24,7 +24,7 @@
 
     export default {
         props: {
-            data: {
+            type: {
                 type: String,
                 default: ''
             }
@@ -49,8 +49,8 @@
                 block.value = _block
             }
 
-            watch(props, ({ data }, _) => {
-                buildBlock(data)
+            watch(() => props.type, (type) => {
+                buildBlock(type)
             }, {
                 deep: true,
                 immediate: true

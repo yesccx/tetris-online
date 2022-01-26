@@ -115,24 +115,24 @@
             // socket监听
             const socketListen = (type = 'on') => {
                 // 用户进入房间
-                $wsClient.socket('/game')[type]('join-room', (data) => {
+                $wsClient.socket('/game')[type]('join-room', type == 'off' ? undefined : (data) => {
                     Toast(data + ' 进入房间');
                     flushMemberList();
                 });
 
                 // 用户离开房间
-                $wsClient.socket('/game')[type]('leave-room', (data) => {
+                $wsClient.socket('/game')[type]('leave-room', type == 'off' ? undefined : (data) => {
                     Toast(data + ' 离开房间');
                     flushMemberList();
                 });
 
                 // 用户准备状态更新
-                $wsClient.socket('/game')[type]('room-update', (data) => {
+                $wsClient.socket('/game')[type]('room-update', type == 'off' ? undefined : (data) => {
                     flushMemberList();
                 });
 
                 // 房间关闭
-                $wsClient.socket('/game')[type]('room-close', (data) => {
+                $wsClient.socket('/game')[type]('room-close', type == 'off' ? undefined : (data) => {
                     socketListen('off')
                     Dialog.alert({
                         title: '提示',
@@ -144,7 +144,7 @@
                 });
 
                 // 游戏开始
-                $wsClient.socket('/game')[type]('game-start', (data) => {
+                $wsClient.socket('/game')[type]('game-start', type == 'off' ? undefined : (data) => {
                     $store.commit('setCurrentRoomStatus', 1);
                     $store.commit('setCurrentRoomBlocks', data.blocks);
 
@@ -166,7 +166,7 @@
                 state.fightPlayerCss.zoom = Math.min(sacle, maxScale);
 
                 // 玩家屏幕 缩放比例
-                const maxHeight = clientHeight * .8 - 30;
+                const maxHeight = clientHeight * .8 - 60;
                 state.playerCss.zoom = maxHeight * 0.8 / 800;
             }
 

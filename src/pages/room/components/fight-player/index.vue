@@ -1,18 +1,18 @@
 <template>
     <div class="fight-player" :class="{vacancy: isVacancy}">
-        <div class="rect" :class="drop?'drop':''">
+        <div class="rect">
             <div class="screen">
                 <div class="panel">
                     <!-- 矩阵/主界面 -->
-                    <Matrix :username="info.username" :prop-matrix="blocks" :cur="cur" :reset="reset" />
+                    <Matrix :username="info.username" :prop-matrix="blocks" :cur="cur" />
 
                     <!-- 恐龙Logo -->
-                    <Logo />
+                    <Logo :userReadyStatus="info.isReady" />
 
                     <div class="state">
                         <!-- 计分 -->
                         <p>得分</p>
-                        <Number :number="info.points" />
+                        <Point :number="info.points" />
 
                         <!-- 消除行 -->
                         <p>消除行</p>
@@ -24,9 +24,9 @@
 
                         <!-- 下一个方块 -->
                         <p>下一个</p>
-                        <Next :data="nextBlock" />
+                        <Next :type="nextBlock" />
                         <div class="bottom">
-                            <Pause :data="pause" />
+                            <Pause :username="info.username" :status="gamePause" />
                         </div>
                     </div>
                 </div>
@@ -41,15 +41,15 @@
 </template>
 
 <script>
-    import { defineComponent, onMounted, computed, toRefs, reactive, ref, watch } from 'vue'
+    import { defineComponent, computed, toRefs, reactive } from 'vue'
     import { useStore } from 'vuex'
-    import states from '@/control/states'
     import Logo from './logo/index.vue'
     import Matrix from './matrix/index.vue'
     import Next from './next/index.vue'
     import Number from './number/index.vue'
     import Pause from './pause/index.vue'
     import Username from './username/index.vue'
+    import Point from './point/index.vue'
 
     import FightPlayerClass from './utils/fight-player-class'
 
@@ -62,6 +62,7 @@
             Number,
             Pause,
             Username,
+            Point,
         },
         props: {
             info: {
@@ -84,10 +85,8 @@
             const $store = useStore()
             const state = reactive({})
 
-            const pause = computed(() => $store.state.pause)
+            const gamePause = computed(() => $store.state.gameRoom.pause)
             const cur = computed(() => $store.state.cur)
-            const reset = computed(() => $store.state.reset)
-            const drop = computed(() => $store.state.drop)
 
             // 下一个方块
             const nextBlock = computed(() => {
@@ -102,12 +101,10 @@
             return {
                 ...toRefs(state),
                 ...toRefs(props),
-                pause,
                 nextBlock,
                 isVacancy,
-                cur,
-                reset,
-                drop
+                gamePause,
+                cur
             }
         }
     })

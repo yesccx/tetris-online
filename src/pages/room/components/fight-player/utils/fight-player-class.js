@@ -11,10 +11,10 @@ class FightPlayerClass {
     speedRun = 1
 
     // 是否房主
-    isOwner = 0
+    isOwner = false
 
     // 是否准备
-    isReady = 0
+    isReady = false
 
     constructor(attributes) {
         this.fill(attributes)

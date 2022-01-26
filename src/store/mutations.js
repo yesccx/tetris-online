@@ -72,6 +72,9 @@ const mutations = {
     key_setting(state, data) {
         state.keyboard['setting'] = data
     },
+    key_multifunction(state, data) {
+        state.keyboard['multifunction'] = data
+    },
     setSessionUsername(state, username = '') {
         // 暂存登录状态
         window.sessionStorage.setItem('session.username', username)
@@ -131,6 +134,7 @@ const mutations = {
         })
 
         state.gameRoomMembers = gameRoomMembers
+        state.gameRoom.currentCount = members.length
     },
     // 设置当前房间成员
     setGameRoomMembers(state, members = []) {
@@ -138,8 +142,8 @@ const mutations = {
             const info = members[i]
             state.gameRoomMembers[i].fill({
                 username: info?.username || '',
-                isOwner: info?.is_owner || false,
-                isReady: info?.is_ready || false,
+                isOwner: Boolean(info?.is_owner || false),
+                isReady: Boolean(info?.is_ready || false),
 
                 blocks: info?.blocks || [],
                 blockIndex: info?.block_index || 0,
@@ -149,10 +153,19 @@ const mutations = {
                 speedRun: info?.speed_run || 0,
             })
         }
+        state.gameRoom.currentCount = members.length
     },
     // 服务器连接状态
     setServerStatus(state, status) {
         state.serverStatus = status;
+    },
+    // 设置 用户设置项-布局风格
+    setUserSettingLayoutStyle(state, layoutStyle) {
+        state.userSetting.layoutStyle = layoutStyle
+    },
+    // 设置 玩家数据-准备状态
+    setPlayerReadyStatus(state, status) {
+        state.playerData.isReady = status;
     },
 }
 export default mutations

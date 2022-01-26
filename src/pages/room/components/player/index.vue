@@ -6,23 +6,33 @@
                     <!-- 矩阵/主界面 -->
                     <Matrix :propMatrix="matrix" :cur="cur" :reset="reset" />
 
-                    <Logo :cur="!!cur" :reset="reset" />
+                    <!-- 恐龙Logo -->
+                    <Logo />
+
                     <div class="state">
-                        <Point :cur="!!cur" :max="max" :point="points" />
-                        <p>{{pContent}}</p>
+                        <!-- 计分 -->
+                        <p>得分</p>
+                        <Point :number="points" />
+
+                        <!-- 消除行 -->
+                        <p>消除行</p>
                         <Number :number='cur ? clearLines : startLines' />
-                        <p>{{level}}</p>
+
+                        <!-- 级别 -->
+                        <p>级别</p>
                         <Number :number='cur ? speedRun : speedStart' :length="1" />
-                        <p>{{nextText}}</p>
-                        <Next :data="next" />
+
+                        <!-- 下一个方块 -->
+                        <p>下一个</p>
+                        <Next :type="next" />
                         <div class="bottom">
-                            <Pause :data="pause" />
-                            <Number :propTime="true" />
+                            <Pause :status="pause" />
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+
         <Keyboard :filling='filling' :cur="!!cur" />
     </div>
 </template>
@@ -30,7 +40,7 @@
 <script>
     import { defineComponent, onMounted, ref, computed } from 'vue'
     import { useStore } from 'vuex'
-    import { transform, lastRecord, speeds, i18n, lan } from '@/utils/constant'
+    import { transform } from '@/utils/constant'
     import { visibilityChangeEvent, isFocus } from '@/utils'
     import states from '@/control/states'
     import Keyboard from './keyboard/index.vue'
@@ -72,10 +82,6 @@
             const max = computed(() => store.state.max)
             const reset = computed(() => store.state.reset)
             const drop = computed(() => store.state.drop)
-
-            const pContent = computed(() => cur.value ? i18n.cleans[lan] : i18n.startLine[lan])
-            const level = computed(() => i18n.level[lan])
-            const nextText = computed(() => i18n.next[lan])
 
             onMounted(() => {
                 window.addEventListener('resize', resize, true)
@@ -151,9 +157,6 @@
                 max,
                 reset,
                 drop,
-                pContent,
-                level,
-                nextText
             }
         }
     })

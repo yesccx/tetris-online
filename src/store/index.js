@@ -157,18 +157,24 @@ const state = {
         rotate: false,
         reset: false,
         pause: false,
-        setting: false
+        setting: false,
+        multifunction: false
     },
 
     // 用户会话
     userSession: {
         username: '',
     },
+    // 用户设置
+    userSetting: {
+        layoutStyle: 'style1',
+    },
 
     // 当前游戏房间
     gameRoom: {
         number: '',
         owner: '',
+        pause: false,
         status: 0,
         currentCount: 0,
         maxCount: 0,
@@ -188,10 +194,14 @@ const state = {
 }
 
 const getters = {
+    // 房间内的对战玩家(不包含自己)
     fightPlayers(state) {
         let players = state.gameRoomMembers
-
         return players.filter((player) => player.username != state.userSession.username).slice(0, 3);
+    },
+    // 房间内玩家是否都已准备
+    gameRoomFightReady(state) {
+        return state.gameRoomMembers.every((player) => !player.username || player.isReady)
     }
 }
 

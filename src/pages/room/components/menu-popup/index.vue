@@ -32,10 +32,10 @@
                     </template>
                     <template #input>
                         <van-radio-group v-model="team" direction="horizontal">
-                            <van-radio name="红">红</van-radio>
-                            <van-radio name="黄">黄</van-radio>
-                            <van-radio name="蓝">蓝</van-radio>
-                            <van-radio name="绿">绿</van-radio>
+                            <van-radio name="红" checked-color="red">红</van-radio>
+                            <van-radio name="黄" checked-color="#dede29">黄</van-radio>
+                            <van-radio name="蓝" checked-color="blue">蓝</van-radio>
+                            <van-radio name="绿" checked-color="green">绿</van-radio>
                         </van-radio-group>
                     </template>
                 </van-field>
@@ -62,9 +62,11 @@
                         <van-icon name="graphic" /> 控制器
                     </template>
                     <template #input>
-                        <van-radio-group v-model="controllerStyle" direction="horizontal">
-                            <van-radio :name="1">风格1</van-radio>
-                            <van-radio :name="2">风格2</van-radio>
+                        <van-radio-group v-model="controllerStyle" direction="horizontal"
+                            @change="onControllerStyleChange">
+                            <van-radio v-for="style in controllerStyleResource" :name="style.index" :key="style.index">
+                                {{ style.name }}
+                            </van-radio>
                         </van-radio-group>
                     </template>
                 </van-field>
@@ -84,6 +86,8 @@
 
     import { wsClient as $wsClient } from '@/utils/websocket'
     import { loading, unloading } from '@/utils/common'
+
+    import keyboardLayout from '../player/keyboard/layout';
 
     export default {
         components: {
@@ -114,10 +118,16 @@
                 team: '红',
                 speed: 1,
                 mode: 1,
-                controllerStyle: 1,
+                controllerStyle: $store.state.userSetting.layoutStyle,
                 bgmSwitch: true,
                 soundSwitch: true,
+                controllerStyleResource: []
             })
+
+            state.controllerStyleResource = Object.keys(keyboardLayout).map((index) => ({
+                name: keyboardLayout[index].name,
+                index: index
+            }))
 
             watch(() => props.show, (value) => {
                 emit('update:show', value)
@@ -138,10 +148,16 @@
                 })
             }
 
+            // 事件: 控制器风格变更
+            const onControllerStyleChange = (value) => {
+                $store.commit('setUserSettingLayoutStyle', value)
+            }
+
             return {
                 ...toRefs(state),
                 ...toRefs(props),
-                onQuitRoom
+                onQuitRoom,
+                onControllerStyleChange,
             }
         }
     }

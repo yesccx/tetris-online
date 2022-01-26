@@ -3,14 +3,13 @@ import App from './App.vue'
 import store from './store'
 import router from './router'
 
-
 import '@/assets/css/index.css';
 import 'vant/lib/index.css';
 
 import './utils/constant';
 import './control';
-import { subscribeRecord } from './utils';
-subscribeRecord(store);
+import { subscribeStoreUserSetting } from './utils';
+subscribeStoreUserSetting(store);
 
 createApp(App)
     .use(store)

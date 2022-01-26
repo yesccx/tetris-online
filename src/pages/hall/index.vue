@@ -48,7 +48,7 @@
             // socket监听
             const socketListen = (type = 'on') => {
                 // 在线人数更新
-                $wsClient.socket('/game')[type]('online-update', (data) => {
+                $wsClient.socket('/game')[type]('online-update', type == 'off' ? undefined : (data) => {
                     state.onlineCount = data
                 })
             }

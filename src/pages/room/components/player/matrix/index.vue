@@ -3,7 +3,6 @@
         <p v-for="(p, $pIndex) in matrix" :key="$pIndex">
             <b v-for="(e, $eIndex) in p" :key="$eIndex" :class="(e === 1 ? 'c' : '') + (e === 2 ? 'd' : '')" />
         </p>
-
     </div>
 </template>
 

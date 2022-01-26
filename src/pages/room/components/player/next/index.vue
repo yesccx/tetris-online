@@ -7,8 +7,9 @@
 </template>
 
 <script>
-    import { watch, ref, onMounted } from 'vue';
+    import { watch, ref } from 'vue';
     import { blockShape } from '@/utils/constant'
+
     const xy = {
         // 方块在下一个中的坐标
         I: [1, 0],
@@ -20,9 +21,10 @@
         T: [0, 0]
     }
     const empty = [[0, 0, 0, 0], [0, 0, 0, 0]]
+
     export default {
         props: {
-            data: {
+            type: {
                 type: String,
                 default: ''
             }
@@ -30,7 +32,11 @@
         setup(props) {
             const block = ref(empty)
 
-            const build = (type) => {
+            const buildBlock = (type) => {
+                if (!type) {
+                    return
+                }
+
                 const shape = blockShape[type]
                 const _block = empty.map(e => [...e])
                 shape.forEach((m, k1) => {
@@ -43,8 +49,8 @@
                 block.value = _block
             }
 
-            watch(props, (newVal, _) => {
-                build(newVal.data)
+            watch(() => props.type, (type) => {
+                buildBlock(type)
             }, {
                 deep: true,
                 immediate: true
