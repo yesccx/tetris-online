@@ -10,23 +10,29 @@ const down = store => {
             interval: 40,
             callback: stopDownTrigger => {
                 const state = store.state;
+
+                // 锁定状态时不允许操作
                 if (state.lock) {
                     return;
                 }
-                const cur = state.cur;
+
+                // 游戏未开始时不允许操作
+                if (state.gameRoom.status != 1) {
+                    return
+                }
+
+                // 当前不存在方块时不允许操作
+                const cur = state.playerData.cur
                 if (cur === null) {
-                    return;
+                    return
                 }
-                if (state.pause) {
-                    states.pause(false);
-                    return;
-                }
+
                 const next = cur.fall();
-                if (want(next, state.matrix)) {
+                if (want(next, state.playerData.matrix)) {
                     store.commit("moveBlock", next);
                     states.auto();
                 } else {
-                    let matrix = JSON.parse(JSON.stringify(state.matrix));
+                    let matrix = JSON.parse(JSON.stringify(state.playerData.matrix));
                     const shape = cur.shape;
                     const xy = cur.xy;
                     shape.forEach((m, k1) =>
@@ -54,14 +60,10 @@ const down = store => {
                     return;
                 }
                 const state = store.state;
-                const cur = state.cur;
+                const cur = state.playerData.cur;
                 if (cur) {
                     return;
                 }
-                let startLines = state.startLines;
-                startLines = startLines - 1 < 0 ? 10 : startLines - 1;
-                store.commit("startLines", startLines);
-                // store.dispatch(actions.startLines(startLines));
             }
         });
     }

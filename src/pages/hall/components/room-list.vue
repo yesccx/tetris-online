@@ -1,11 +1,15 @@
 <template>
     <div class="room-list p-4">
-        <div class="room-wrapper" v-for="room in roomList" :key="room.number" @click="onJoinRoom(room.number)">
+        <div class="room-wrapper" v-for="room in roomList" :key="room.number" @click="onJoinRoom(room.number)"
+            :class="{fire: room.status == 1}">
             <div class="info ">
                 <span class="number">#{{ room.format_number }}</span>
                 <span class="count">{{ room.current_count }}/{{ room.max_count }}</span>
             </div>
-            <span class="title">{{ room.title }}</span>
+            <span class="title">
+                <span class="mr-2" v-show="room.status == 1">[游戏中] </span>
+                <span>{{ room.title }}</span>
+            </span>
         </div>
 
         <div class="text-center">
@@ -92,7 +96,9 @@
                 }, (data) => {
                     state.joinRoomLoading = false;
                     if (!data['success']) {
-                        return Toast.fail(data['message'] || '未知错误');
+                        return setTimeout(() => {
+                            Toast.fail(data['message'] || '未知错误')
+                        }, 0);
                     }
 
                     // 前往房间

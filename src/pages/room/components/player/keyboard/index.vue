@@ -14,18 +14,10 @@
             label="右移" :active="keyboard['right']" />
         <v-button ref="dom_space_el" color="blue" :size="useStyleData.space.size" :top="useStyleData.space.top"
             :left="useStyleData.space.left" label="掉落(SPACE)" :active="keyboard['drop']" />
-        <v-button v-if="playerData.isOwner && !gameStarted" ref="dom_multifunction_el" color="green"
-            :size="useStyleData.multifunction.size" :top="useStyleData.multifunction.top"
-            :left="useStyleData.multifunction.left" label="开始" :active="keyboard['multifunction']" />
-        <v-button v-if="!playerData.isOwner && !gameStarted" ref="dom_multifunction_el"
-            :color="playerData.isReady ? 'red' : 'green'" :size="useStyleData.multifunction.size"
+        <v-button ref="dom_multifunction_el" :color="multifunctionButton.color" :size="useStyleData.multifunction.size"
             :top="useStyleData.multifunction.top" :left="useStyleData.multifunction.left"
-            :label="playerData.isReady ? '取消准备' : '准备'" :active="keyboard['multifunction']" />
-        <v-button v-if="gameStarted" ref="dom_multifunction_el" :color="isPause ? 'green' : 'red'"
-            :size="useStyleData.multifunction.size" :top="useStyleData.multifunction.top"
-            :left="useStyleData.multifunction.left" :label="isPause ? '暂停' : '恢复'"
-            :active="keyboard['multifunction']" />
-        <v-button ref="dom_setting_el" color="orange" :size="useStyleData.setting.size" :top="useStyleData.setting.top"
+            :label="multifunctionButton.label" :active="keyboard['multifunction']" />
+        <v-button ref="dom_setting_el" color="red" :size="useStyleData.setting.size" :top="useStyleData.setting.top"
             :left="useStyleData.setting.left" label="设置" :active="keyboard['setting']" />
     </div>
 </template>
@@ -45,7 +37,6 @@
         },
         props: {
             filling: {
-                type: Number,
                 default: 0
             }
         },
@@ -80,9 +71,44 @@
                 return (keyboardLayout[useStyle] || keyboardLayout['style1'])?.data
             })
 
-            const isPause = computed(() => $store.state.pause)
+            const gameRoom = computed(() => $store.state.gameRoom)
             const keyboard = computed(() => $store.state.keyboard)
             const playerData = computed(() => $store.state.playerData)
+
+            // 多功能按钮
+            const multifunctionButton = computed(() => {
+                const data = {
+                    label: '',
+                    color: '',
+                }
+
+                if (playerData.value.isOwner && !gameStarted.value) {
+                    data.label = '开始'
+                    data.color = 'green'
+                }
+
+                if (!playerData.value.isOwner && !gameStarted.value) {
+                    if (playerData.value.isReady) {
+                        data.label = '取消准备'
+                        data.color = 'red'
+                    } else {
+                        data.label = '准备'
+                        data.color = 'green'
+                    }
+                }
+
+                if (gameStarted.value) {
+                    if (gameRoom.value.pause) {
+                        data.label = '恢复'
+                        data.color = 'green'
+                    } else {
+                        data.label = '暂停'
+                        data.color = 'red'
+                    }
+                }
+
+                return data
+            })
 
             // 对于手机操作, 触发了touchstart, 将作出记录, 不再触发后面的mouse事件
             const touchEventCatch = {}
@@ -128,7 +154,6 @@
                     document.addEventListener(
                         'mousedown',
                         eventCall('mousedown', e => {
-                            console.log('点击')
                             if (e.preventDefault) {
                                 e.preventDefault();
                             }
@@ -220,8 +245,9 @@
                 containerCss,
                 useStyleData,
                 keyboard,
-                isPause,
-                playerData
+                gameRoom,
+                playerData,
+                multifunctionButton
             }
         }
     })

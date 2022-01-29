@@ -29,6 +29,7 @@
     import states from '@/control/states'
     import { wsClient as $wsClient } from '@/utils/websocket'
     import { loading, unloading } from '@/utils/common'
+    import { bgmusic } from '@/utils/bgmusic'
 
     export default defineComponent({
         name: 'page-room',
@@ -50,7 +51,6 @@
 
             // 对战玩家列表
             const fightPlayers = computed(() => {
-                console.log($store.getters.fightPlayers)
                 return $store.getters.fightPlayers || [];
             })
 
@@ -81,9 +81,13 @@
             onUnmounted(() => {
                 window.removeEventListener('resize', adaptiveScreenSize)
 
-                // autoReportFightData(false);
+                autoReportFightData(false);
 
                 socketListen('off')
+
+                $store.state.reset = false
+                $store.state.drop = false
+                $store.state.lock = false
             })
 
             // 初始化房间信息
@@ -145,13 +149,27 @@
 
                 // 游戏开始
                 $wsClient.socket('/game')[type]('game-start', type == 'off' ? undefined : (data) => {
-                    $store.commit('setCurrentRoomStatus', 1);
-                    $store.commit('setCurrentRoomBlocks', data.blocks);
+                    $store.commit('setGameRoomStatus', 1);
+                    $store.commit('setGameRoomBlocks', data.blocks);
 
                     states.start();
 
                     // 开启自动上报游戏数据(每200毫秒)
                     autoReportFightData(true);
+
+                    bgmusic.start()
+                });
+
+                // 游戏暂停
+                $wsClient.socket('/game')[type]('game-pause', type == 'off' ? undefined : (data) => {
+                    autoReportFightData(false)
+                    states.pause(true)
+                });
+
+                // 游戏恢复
+                $wsClient.socket('/game')[type]('game-unpause', type == 'off' ? undefined : (data) => {
+                    autoReportFightData(true)
+                    states.pause(false)
                 });
             }
 
@@ -173,17 +191,27 @@
             // 定时自动上报对战信息
             let reportInterval = 0;
             const autoReportFightData = (status = false) => {
+                const playerData = $store.state.playerData;
                 clearInterval(reportInterval);
+                reportInterval = null
 
                 if (status == true) {
                     reportInterval = setInterval(() => {
                         $wsClient.socket('/game').emit('game-data-report', {
-                            cur: JSON.stringify($store.state.cur),
-                            block_index: $store.state.roomPlayer.blockIndex,
-                            blocks: JSON.parse(JSON.stringify($store.state.matrix))
+                            points: playerData.points,
+                            is_owner: playerData.isOwner ? 1 : 0,
+                            is_ready: playerData.isReady ? 1 : 0,
+                            is_over: playerData.isOver ? 1 : 0,
+                            block_index: playerData.blockIndex,
+                            cur: JSON.stringify(playerData.cur),
+                            speed_run: playerData.speedRun,
+                            clear_lines: playerData.clearLines,
+                            matrix: JSON.stringify(playerData.matrix),
+                            discharge_buffers: JSON.stringify(playerData.dischargeBuffers),
+                            fill_buffers: JSON.stringify(playerData.fillBuffers),
                         });
                         flushMemberList();
-                    }, 100);
+                    }, 30);
                 }
             }
 

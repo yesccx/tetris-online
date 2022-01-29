@@ -4,6 +4,7 @@
             style="font-size: 45px;width: 100%;padding: 0 40px;height: 65px;line-height: 65px;">
             <span class="pr-1" v-if="isOwner">[房主]</span>{{ username }}
         </p>
+        <div style="width: 100%;background:red;width:100%"></div>
     </div>
 </template>
 

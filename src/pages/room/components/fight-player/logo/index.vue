@@ -10,7 +10,7 @@
 
     export default {
         props: {
-            userReadyStatus: {
+            status: {
                 type: Boolean,
                 default: false
             }
@@ -106,14 +106,12 @@
                 isShow(dra, true)
             }
 
-            // 显示准备动画
-            watch(() => props.userReadyStatus, (newValue, oldValue) => {
-                if (newValue != oldValue) {
-                    if (newValue) {
-                        show()
-                    } else {
-                        hidden()
-                    }
+            // 显示动画
+            watch(() => props.status, (newValue) => {
+                if (newValue) {
+                    show()
+                } else {
+                    hidden()
                 }
             }, {
                 immediate: true
@@ -121,8 +119,6 @@
 
             return {
                 ...toRefs(state),
-                show,
-                hidden
             }
         }
     }

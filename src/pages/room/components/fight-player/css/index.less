@@ -2,21 +2,42 @@
     box-shadow: 0 0 10px #fff inset;
     border-radius: 20px;
     background: #fee94e;
+    position: relative;
 
     &.vacancy {
         -webkit-filter: grayscale(60%);
         filter: grayscale(60%);
     }
 
+    .buffer-container {
+        width: 85%;
+        margin: 0 auto;
+        margin-bottom: 10px;
+        height: 22px;
+    }
+
     .vacancy-tip {
         font-size: 3.3rem;
         position: absolute;
-        background: #ffffffcc;
+        background-color: #ffffffcc;
         width: 94%;
         text-align: center;
         top: 40%;
         color: #494848;
         padding: 25px;
+        /* margin: 20px; */
+        margin: 3%;
+    }
+
+    .over-tip {
+        font-size: 3.3rem;
+        position: absolute;
+        width: 94%;
+        text-align: center;
+        top: 40%;
+        color: #fff;
+        padding: 25px;
+        background-color: #ff0000cc;
         /* margin: 20px; */
         margin: 3%;
     }
@@ -89,6 +110,7 @@
     .rect {
         width: 480px;
         padding: 45px 0 15px;
+        padding-top: 20px;
         border: #000 solid;
         border-width: 0 10px 10px;
         margin: 0 auto;

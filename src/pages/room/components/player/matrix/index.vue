@@ -7,10 +7,11 @@
 </template>
 
 <script>
-    import { watch, ref, onMounted } from 'vue';
+    import { watch, ref, onMounted, reactive, toRefs } from 'vue';
     import { isClear } from '@/utils'
     import { fillLine, blankLine } from '@/utils/constant'
     import states from '@/control/states'
+
     const sleep = (delay) => {
         return new Promise((resolve) => {
             setTimeout(resolve, delay)
@@ -35,40 +36,44 @@
             }
         },
         setup(props) {
-
-            const clearLines = ref([])
-            const animateColor = ref(2)
-            const isOver = ref(false)
-            const overState = ref(null)
-            const matrix = ref([])
+            const state = reactive({
+                clearLines: [],
+                animateColor: 2,
+                isOver: false,
+                overMatrix: null,
+                matrix: []
+            })
 
             const propsChange = async (nextProps) => {
                 const clears = isClear(nextProps.propMatrix)
                 const overs = nextProps.reset
                 setTimeout(() => {
-                    clearLines.value = clears
-                    isOver.value = overs
+                    state.clearLines = clears
+                    state.isOver = overs
                 }, 0)
 
-                if (clears && !clearLines.value) {
+                if (clears && !state.clearLines) {
                     clearAnimate()
-                } else if (!clears && overs && !isOver.value) {
-                    over(nextProps)
+                } else if (!clears && overs && !state.isOver) {
+                    // over(nextProps)
+                    // TODO: 游戏结束动画
+                    render()
                 } else {
-                    clearLines.value = false
+                    state.clearLines = false
                     render()
                 }
             }
 
+            // 消除行时的动画
             const clearAnimate = async () => {
                 const anima = callback => {
                     return new Promise((resolve) => {
                         sleep(100).then(() => {
-                            animateColor.value = 0
+                            state.animateColor = 0
                             render()
                             return sleep(100)
                         }).then(() => {
-                            animateColor.value = 2
+                            state.animateColor = 2
                             render()
                             if (typeof callback === 'function') {
                                 callback()
@@ -82,24 +87,24 @@
                 await anima()
                 await anima(() => {
                     sleep(100).then(() => {
-                        states.clearLines(props.propMatrix, clearLines.value)
+                        states.clearLines(props.propMatrix, state.clearLines)
                     })
                 })
             }
 
             const over = async (nextProps) => {
-                let _overState = getResult(nextProps)
-                overState.value = [..._overState]
+                let _overMatrix = buildRenderData(nextProps)
+                state.overMatrix = [..._overMatrix]
                 const exLine = index => {
                     if (index <= 19) {
-                        _overState[19 - index] = fillLine
+                        _overMatrix[19 - index] = fillLine
                     } else if (index >= 20 && index <= 39) {
-                        _overState[index - 20] = blankLine
+                        _overMatrix[index - 20] = blankLine
                     } else {
                         states.overEnd()
                         return
                     }
-                    overState.value = [..._overState]
+                    state.overMatrix = [..._overMatrix]
                     render()
                 }
 
@@ -108,8 +113,8 @@
                 }
             }
 
-
-            const getResult = (_props) => {
+            // 构建渲染的数据
+            const buildRenderData = (_props) => {
                 if (!_props) {
                     _props = props
                 }
@@ -117,9 +122,9 @@
                 const shape = cur && cur.shape
                 const xy = cur && cur.xy
                 let matrix = JSON.parse(JSON.stringify(_props.propMatrix))
-                const _clearLines = clearLines.value
+                const _clearLines = state.clearLines
                 if (_clearLines) {
-                    const _animateColor = animateColor.value
+                    const _animateColor = state.animateColor
                     _clearLines.forEach(index => {
                         matrix[index] = new Array(10).fill(_animateColor)
                     })
@@ -146,18 +151,19 @@
             }
 
             const render = () => {
-                matrix.value = isOver.value ? overState.value : getResult(props)
+                state.matrix = buildRenderData(props)
+                // state.matrix = state.isOver ? state.overMatrix : buildRenderData(props)
             }
 
-            watch(props, (newVal = {}, _) => {
-                propsChange(newVal)
+            watch(props, (newValue = {}) => {
+                propsChange(newValue)
             }, {
                 deep: true,
                 immediate: true
             })
 
             return {
-                matrix
+                ...toRefs(state)
             }
         }
     }

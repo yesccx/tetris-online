@@ -11,10 +11,6 @@
                 type: Boolean,
                 default: true
             },
-            username: {
-                type: String,
-                default: '',
-            },
         },
         setup(props) {
             const state = reactive({
@@ -35,14 +31,9 @@
                 }
             }
 
-            watch(() => props, (newValue) => {
-                if (newValue.username) {
-                    setShake(newValue.status)
-                } else {
-                    setShake(false)
-                }
+            watch(() => props.status, (status) => {
+                setShake(status)
             }, {
-                deep: true,
                 immediate: true
             })
 

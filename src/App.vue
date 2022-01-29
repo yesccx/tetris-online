@@ -26,7 +26,6 @@
                     })
 
                     watch(() => $store.state.serverStatus, (status) => {
-                        console.log(status)
                         if (status) {
                             Notify.clear()
                         }

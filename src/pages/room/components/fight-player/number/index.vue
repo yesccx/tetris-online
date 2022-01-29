@@ -25,20 +25,22 @@
 
             watch(() => props, () => {
                 render()
+            }, {
+                deep: true
             })
-
-            const render = () => {
-                const num = `${props.number || 0}`.split('')
-                const maxLength = props.length || 6
-                for (let i = 0, len = maxLength - num.length; i < len; i++) {
-                    num.unshift('n')
-                }
-                state.numData = num
-            }
 
             onMounted(() => {
                 render()
             })
+
+            const render = () => {
+                const numData = `${props.number || 0}`.split('')
+                const maxLength = props.length || 6
+                for (let i = 0, len = maxLength - numData.length; i < len; i++) {
+                    numData.unshift('n')
+                }
+                state.numData = numData
+            }
 
             return {
                 ...toRefs(state)

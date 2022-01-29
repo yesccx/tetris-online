@@ -1,5 +1,6 @@
 import { wsClient as $wsClient } from '@/utils/websocket';
 import { Toast } from 'vant'
+import states from '../states';
 
 const down = store => {
     store.commit('key_multifunction', true)
@@ -15,10 +16,29 @@ const up = store => {
     }
     lock = true;
 
-    if (store.state.gameRoom.status == 1) {
-        // TODO: 游戏暂停..
+    const playerData = store.state.playerData
+    const gameRoom = store.state.gameRoom
+    if (gameRoom.status == 1) {
+        // 游戏暂停/恢复
+        if (gameRoom.pause) {
+            $wsClient.socket('/game').emit('game-unpause', (data) => {
+                lock = false;
+                if (!data['success']) {
+                    return Toast.fail(`恢复游戏失败（${data['message'] || '未知错误'}）`);
+                }
+                states.pause(false)
+            });
+        } else {
+            $wsClient.socket('/game').emit('game-pause', (data) => {
+                lock = false;
+                if (!data['success']) {
+                    return Toast.fail(`暂停游戏失败（${data['message'] || '未知错误'}）`);
+                }
+                states.pause(true)
+            });
+        }
     } else {
-        if (store.state.playerData.isOwner) {
+        if (playerData.isOwner) {
             $wsClient.socket('/game').emit('game-start', (data) => {
                 lock = false;
                 if (!data['success']) {
@@ -26,7 +46,7 @@ const up = store => {
                 }
             });
         } else {
-            if (store.state.playerData.isReady) {
+            if (playerData.isReady) {
                 store.commit('setPlayerReadyStatus', false);
                 $wsClient.socket('/game').emit('game-unready', () => {
                     lock = false;

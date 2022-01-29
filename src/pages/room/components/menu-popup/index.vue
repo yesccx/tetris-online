@@ -1,7 +1,7 @@
 <template>
     <van-action-sheet v-model:show="show" title="设置">
-        <div style="padding: 0 10px 20px 10px;">
-            <van-form input-align="right" label-width="90px">
+        <div style="padding: 0 10px 20px 10px;zoom:0.85">
+            <van-form input-align="right" label-width="110px">
                 <van-divider content-position="left">局内游戏</van-divider>
                 <van-field name="slider" label="游戏模式">
                     <template #label>
@@ -19,7 +19,7 @@
                         <van-icon name="fire" /> 初始速度
                     </template>
                     <template #input>
-                        <van-slider v-model="speed" :min="1" :max="10">
+                        <van-slider v-model="speed" :min="1" :max="6">
                             <template #button>
                                 <div class="van-slider__button text-center text-gray-500">{{ speed }}</div>
                             </template>

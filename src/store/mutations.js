@@ -1,40 +1,41 @@
-import { getNextType } from '@/utils'
 import Block from '@/utils/block'
 import FightPlayerClass from '@/pages/room/components/fight-player/utils/fight-player-class'
+import { blankMatrix } from '@/utils/constant'
+import states from '@/control/states'
 
 const mutations = {
-    nextBlock(state, data) {
-        if (!data) {
-            data = getNextType()
-        }
-        state.next = data
+    prepareNextBlock(state) {
+        states.fillPlayerSurplusBuffers()
+        state.playerData.blockIndex++
+    },
+    autoMoveBlock(state, getters) {
+        this.commit('moveBlock', {
+            type: state.gameRoom.blocks[state.playerData.blockIndex] || ''
+        })
     },
     moveBlock(state, data) {
-        state.cur = data.reset === true ? null : new Block(data)
+        state.playerData.cur = data.reset === true ? null : new Block(data)
     },
     speedStart(state, data) {
-        state.speedStart = data
+        state.gameRoom.speedStart = data
     },
     speedRun(state, data) {
-        state.speedRun = data
+        state.playerData.speedRun = data
     },
     startLines(state, data) {
-        state.startLines = data
+        state.gameRoom.startLines = data
     },
     matrix(state, data) {
-        state.matrix = data
+        state.playerData.matrix = data
     },
     lock(state, data) {
         state.lock = data
     },
     clearLines(state, data) {
-        state.clearLines = data
+        state.playerData.clearLines = data
     },
     points(state, data) {
-        state.points = data
-    },
-    max(state, data) {
-        state.max = data
+        state.playerData.points = data
     },
     reset(state, data) {
         state.reset = data
@@ -43,7 +44,7 @@ const mutations = {
         state.drop = data
     },
     pause(state, data) {
-        state.pause = data
+        state.gameRoom.pause = Boolean(data)
     },
     focus(state, data) {
         state.focus = data
@@ -81,22 +82,35 @@ const mutations = {
         state.userSession.username = username;
     },
     // 加入房间
-    joinGameRoom(state, { number = '', current_count = 0, max_count, status = 0, owner = '', members = [], blocks = [], userinfo = {} }) {
+    joinGameRoom(state, {
+        number = '',
+        current_count = 0,
+        max_count,
+        owner = '',
+        status = 0,
+        pause = 0,
+        blocks = [],
+        speed_start = 1,
+        start_lines = 0,
+        userinfo = {},
+        members = [],
+    }) {
         // 房间信息
         state.gameRoom.number = number;
-        state.gameRoom.owner = owner;
-        state.gameRoom.status = status;
         state.gameRoom.currentCount = current_count;
         state.gameRoom.maxCount = max_count;
+        state.gameRoom.owner = owner;
+        state.gameRoom.status = status;
+        state.gameRoom.pause = Boolean(pause);
         state.gameRoom.blocks = blocks;
+        state.gameRoom.speedStart = speed_start;
+        state.gameRoom.startLines = start_lines;
 
         // 初始化房间成员
         this.commit('initGameRoomMembers', members);
 
-        // 当前玩家信息
-        state.playerData.blockIndex = userinfo.block_index || 0
-        state.playerData.isReady = Boolean(userinfo.is_ready || 0)
-        state.playerData.isOwner = Boolean(userinfo.is_owner || 0)
+        // 设置当前玩家信息
+        this.commit('setPlayerData', userinfo)
     },
     // 退出房间
     quitGameRoom(state) {
@@ -111,10 +125,23 @@ const mutations = {
         // 房间成员列表
         this.commit('setGameRoomMembers', []);
 
-        // 当前玩家信息
-        state.playerData.blockIndex = 0
-        state.playerData.isReady = false
-        state.playerData.isOwner = false
+        // 重置当前玩家信息
+        this.commit('setPlayerData', {})
+    },
+    // 设置 玩家数据
+    setPlayerData(state, data) {
+        state.playerData.points = data?.points || 0
+        state.playerData.isOwner = Boolean(data?.is_owner || 0)
+        state.playerData.isReady = Boolean(data?.is_ready || 0)
+        state.playerData.isOver = Boolean(data?.is_over || 0)
+        state.playerData.blockIndex = data?.block_index || 0
+        state.playerData.cur = data?.cur || null
+        state.playerData.dischargeBuffers = data?.discharge_buffers || 0
+        state.playerData.fillBuffers = data?.fill_buffers || 0
+        state.playerData.speedRun = data?.speed_run || 1
+        state.playerData.clearLines = data?.clear_lines || 0
+        state.playerData.matrix = data?.matrix || blankMatrix
+        state.playerData.buffers = data?.buffers || []
     },
     // 初始化房间成员
     initGameRoomMembers(state, members = []) {
@@ -128,13 +155,21 @@ const mutations = {
         members.forEach((info, index) => {
             gameRoomMembers[index].fill({
                 username: info?.username || '',
-                isOwner: info?.is_owner || false,
-                isReady: info?.is_ready || false,
+                matrix: info?.matrix ? JSON.parse(info.matrix) : blankMatrix,
+                blockIndex: info?.block_index || 0,
+                points: info?.points || 0,
+                clearLines: info?.clear_lines || 0,
+                speedRun: info?.speed_run || 0,
+                dischargeBuffers: info?.discharge_buffers || 0,
+                fillBuffers: info?.fill_buffers || 0,
+                isOwner: Boolean(info?.is_owner || false),
+                isReady: Boolean(info?.is_ready || false),
+                isOver: Boolean(info?.is_over || false),
+                cur: info?.cur ? JSON.parse(info.cur) : null,
             })
         })
 
         state.gameRoomMembers = gameRoomMembers
-        state.gameRoom.currentCount = members.length
     },
     // 设置当前房间成员
     setGameRoomMembers(state, members = []) {
@@ -142,18 +177,27 @@ const mutations = {
             const info = members[i]
             state.gameRoomMembers[i].fill({
                 username: info?.username || '',
-                isOwner: Boolean(info?.is_owner || false),
-                isReady: Boolean(info?.is_ready || false),
-
-                blocks: info?.blocks || [],
+                matrix: info?.matrix ? JSON.parse(info.matrix) : blankMatrix,
                 blockIndex: info?.block_index || 0,
                 points: info?.points || 0,
                 clearLines: info?.clear_lines || 0,
-                speedStart: info?.speed_start || 0,
                 speedRun: info?.speed_run || 0,
+                dischargeBuffers: info?.discharge_buffers || 0,
+                fillBuffers: info?.fill_buffers || 0,
+                isOwner: Boolean(info?.is_owner || false),
+                isReady: Boolean(info?.is_ready || false),
+                isOver: Boolean(info?.is_over || false),
+                cur: info?.cur ? JSON.parse(info.cur) : null,
             })
         }
-        state.gameRoom.currentCount = members.length
+    },
+    // 设置当前房间状态
+    setGameRoomStatus(state, status) {
+        state.gameRoom.status = status
+    },
+    // 设置当前blocks
+    setGameRoomBlocks(state, blocks) {
+        state.gameRoom.blocks = blocks
     },
     // 服务器连接状态
     setServerStatus(state, status) {
@@ -166,6 +210,18 @@ const mutations = {
     // 设置 玩家数据-准备状态
     setPlayerReadyStatus(state, status) {
         state.playerData.isReady = status;
+    },
+    // 设置 玩家数据-dischargeBuffers
+    setPlayerDischargeBuffers(state, data) {
+        state.playerData.dischargeBuffers = data;
+    },
+    // 设置 玩家数据-fillBuffers
+    setPlayerFillBuffers(state, data) {
+        state.playerData.fillBuffers = data;
+    },
+    // 设置 玩家数据-结束状态
+    setPlayerOverStatus(state, data) {
+        state.playerData.isOver = data;
     },
 }
 export default mutations

@@ -12,7 +12,7 @@ const down = store => {
                 return
             }
             const cur = state.cur
-            const isPause = state.pause
+            const isPause = state.gameRoom.pause
             if (cur !== null) {
                 // 暂停
                 states.pause(!isPause)

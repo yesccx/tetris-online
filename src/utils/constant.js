@@ -1,5 +1,3 @@
-import i18nJSON from '../i18n.json'
-
 // 每种形状的数据
 export const blockShape = {
     I: [[1, 1, 1, 1]],
@@ -54,29 +52,6 @@ export const clearPoints = [100, 300, 700, 1500]
 // 缓存key值
 export const StorageKey = 'VUE3_TETRIS'
 
-// 上一把的状态
-export const lastRecord = (() => {
-    return null;
-
-    let data = window.localStorage.getItem(StorageKey)
-    if (!data) {
-        return null
-    }
-    try {
-        if (window.btoa) {
-            data = atob(data)
-        }
-        data = decodeURIComponent(data)
-        data = JSON.parse(data)
-    } catch (e) {
-        if (window.console || window.console.error) {
-            window.console.error('读取记录错误:', e)
-        }
-        return null
-    }
-    return data
-})()
-
 // 最高分
 export const maxPoint = 999999
 
@@ -98,18 +73,3 @@ export const getParam = param => {
     const m = window.location.toString().match(r)
     return m ? decodeURI(m[1]) : ''
 }
-
-// 读取语言状态
-export const lan = (() => {
-    return 'cn'
-    let l = getParam('lan').toLowerCase()
-    if (!l && navigator.languages) {
-        l = navigator.languages.find(l => i18nJSON.lan.indexOf(l) !== -1)
-    }
-    l = i18nJSON.lan.indexOf(l) === -1 ? i18nJSON.default : l
-    return l
-})()
-
-document.title = i18nJSON.data.title[lan]
-
-export let i18n = i18nJSON.data

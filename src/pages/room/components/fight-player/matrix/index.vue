@@ -7,15 +7,13 @@
 </template>
 
 <script>
-    import { watch, reactive, toRefs, onMounted } from 'vue';
+    import { watch, reactive, toRefs } from 'vue';
     import { fillLine, blankLine } from '@/utils/constant'
 
     export default {
         props: {
             cur: {
-                default: () => {
-                    return null
-                },
+                default: () => null,
                 type: Object
             },
             propMatrix: {
@@ -85,7 +83,6 @@
                 const shape = cur && cur.shape
                 const xy = cur && cur.xy
                 let matrix = JSON.parse(JSON.stringify(_props.propMatrix))
-
                 if (shape) {
                     shape.forEach((m, k1) =>
                         m.forEach((n, k2) => {
