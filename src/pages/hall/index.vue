@@ -21,6 +21,7 @@
     import RoomList from './components/room-list.vue';
 
     import { wsClient as $wsClient } from '@/utils/websocket'
+    import { music } from '@/utils/music';
 
     export default defineComponent({
         name: 'page-hall',

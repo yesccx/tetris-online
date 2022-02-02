@@ -8,7 +8,8 @@
                         <van-icon name="diamond" /> 游戏模式
                     </template>
                     <template #input>
-                        <van-radio-group v-model="mode" direction="horizontal">
+                        <van-radio-group v-model="mode" direction="horizontal" :disabled="!gameRoomSetting"
+                            @change="onSettingsChange">
                             <van-radio :name="1">积分</van-radio>
                             <van-radio :name="2">生存</van-radio>
                         </van-radio-group>
@@ -19,7 +20,8 @@
                         <van-icon name="fire" /> 初始速度
                     </template>
                     <template #input>
-                        <van-slider v-model="speed" :min="1" :max="6">
+                        <van-slider v-model="speed" :min="1" :max="6" :disabled="!gameRoomSetting"
+                            @change="onSettingsChange">
                             <template #button>
                                 <div class="van-slider__button text-center text-gray-500">{{ speed }}</div>
                             </template>
@@ -40,20 +42,30 @@
                     </template>
                 </van-field>
                 <van-divider content-position="left">音效设置</van-divider>
-                <van-field name="slider" label="游戏音乐">
+                <van-field name="slider" label="背景音乐">
                     <template #label>
-                        <van-icon name="audio" /> 游戏音乐
+                        <van-icon name="audio" /> 背景音乐
                     </template>
                     <template #input>
-                        <van-switch v-model="bgmSwitch" size="20px" />
+                        <van-slider v-model="bgmVolume" :min="0" :max="100" @change="onBgmVolumeChange">
+                            <template #button>
+                                <div class="van-slider__button text-center text-gray-500" style="font-size:10px">
+                                    {{ bgmVolume }}</div>
+                            </template>
+                        </van-slider>
                     </template>
                 </van-field>
                 <van-field name="slider" label="游戏音效">
                     <template #label>
-                        <van-icon name="volume" /> 游戏音乐
+                        <van-icon name="volume" /> 游戏音效
                     </template>
                     <template #input>
-                        <van-switch v-model="soundSwitch" size="20px" />
+                        <van-slider v-model="soundVolume" :min="0" :max="100" @change="onSoundVolumeChange">
+                            <template #button>
+                                <div class="van-slider__button text-center text-gray-500" style="font-size:10px">
+                                    {{ soundVolume }}</div>
+                            </template>
+                        </van-slider>
                     </template>
                 </van-field>
                 <van-divider content-position="left">偏好设置</van-divider>
@@ -78,7 +90,7 @@
 </template>
 
 <script>
-    import { reactive, toRefs, watch } from 'vue'
+    import { computed, onMounted, reactive, toRefs, watch } from 'vue'
     import { useStore } from 'vuex'
     import { useRouter } from 'vue-router'
 
@@ -88,6 +100,8 @@
     import { loading, unloading } from '@/utils/common'
 
     import keyboardLayout from '../player/keyboard/layout';
+    import { music } from '@/utils/music'
+    import _ from 'loadsh'
 
     export default {
         components: {
@@ -119,8 +133,8 @@
                 speed: 1,
                 mode: 1,
                 controllerStyle: $store.state.userSetting.layoutStyle,
-                bgmSwitch: true,
-                soundSwitch: true,
+                bgmVolume: $store.state.userSetting.bgmVolume,
+                soundVolume: $store.state.userSetting.soundVolume,
                 controllerStyleResource: []
             })
 
@@ -131,6 +145,38 @@
 
             watch(() => props.show, (value) => {
                 emit('update:show', value)
+            })
+
+            // 控制背景音乐
+            watch(() => state.bgmVolume, (value) => {
+                music.bgmusic.volume(value / 100)
+            }, {
+                immediate: true
+            })
+            // 控制游戏音效
+            watch(() => state.soundVolume, (value) => {
+                _(music).each((item, key) => {
+                    if (key != 'bgmusic') {
+                        item.volume(value / 100)
+                    }
+                })
+            }, {
+                immediate: true
+            })
+            // 游戏设置变更
+            watch(() => $store.state.gameRoom, (data) => {
+                state.speed = data.speedStart
+                state.mode = data.mode
+            }, {
+                deep: true,
+                immediate: true
+            })
+
+            onMounted(() => {
+                console.log($store.state.userSetting)
+                state.controllerStyle = $store.state.userSetting.layoutStyle
+                state.bgmVolume = $store.state.userSetting.bgmVolume
+                state.soundVolume = $store.state.userSetting.soundVolume
             })
 
             // 事件: 退出房间
@@ -153,11 +199,36 @@
                 $store.commit('setUserSettingLayoutStyle', value)
             }
 
+            // 事件: 背景音乐音量变更
+            const onBgmVolumeChange = (value) => {
+                $store.commit('setUserSettingBgmVolume', value)
+            }
+
+            // 事件: 游戏音效音量变更
+            const onSoundVolumeChange = (value) => {
+                $store.commit('setUserSettingSoundVolume', value)
+            }
+
+            // 事件: 游戏设置更新
+            const onSettingsChange = () => {
+                loading()
+                $wsClient.socket('/game').emit('game-settings', {
+                    'speed_start': state.speed,
+                    'mode': state.mode
+                }, () => {
+                    unloading()
+                })
+            }
+
             return {
                 ...toRefs(state),
                 ...toRefs(props),
                 onQuitRoom,
                 onControllerStyleChange,
+                onBgmVolumeChange,
+                onSoundVolumeChange,
+                onSettingsChange,
+                gameRoomSetting: computed(() => $store.state.playerData.isOwner && $store.state.gameRoom.status != 1)
             }
         }
     }

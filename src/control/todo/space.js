@@ -11,15 +11,13 @@ const down = store => {
         callback: () => {
             const state = store.state;
 
-            music.fall()
-
             // 锁定状态时不允许操作
             if (state.lock) {
                 return;
             }
 
-            // 游戏未开始时不允许操作
-            if (state.gameRoom.status != 1) {
+            // 游戏未开始、暂停时不允许操作
+            if (state.gameRoom.status != 1 ||  state.gameRoom.pause) {
                 return
             }
 
@@ -28,6 +26,8 @@ const down = store => {
             if (cur === null) {
                 return
             }
+
+            music.fall && music.fall.play()
 
             // 当前方块一直垂直下落
             let index = 0;

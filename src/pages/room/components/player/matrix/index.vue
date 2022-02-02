@@ -11,6 +11,7 @@
     import { isClear } from '@/utils'
     import { fillLine, blankLine } from '@/utils/constant'
     import states from '@/control/states'
+    import { music } from '@/utils/music';
 
     const sleep = (delay) => {
         return new Promise((resolve) => {
@@ -53,7 +54,7 @@
                 }, 0)
 
                 if (clears && !state.clearLines) {
-                    clearAnimate()
+                    await clearAnimate(clears)
                 } else if (!clears && overs && !state.isOver) {
                     // over(nextProps)
                     // TODO: 游戏结束动画
@@ -65,7 +66,7 @@
             }
 
             // 消除行时的动画
-            const clearAnimate = async () => {
+            const clearAnimate = async (clears) => {
                 const anima = callback => {
                     return new Promise((resolve) => {
                         sleep(100).then(() => {
@@ -85,9 +86,10 @@
 
                 await anima()
                 await anima()
+                music.clear && music.clear.play()
                 await anima(() => {
                     sleep(100).then(() => {
-                        states.clearLines(props.propMatrix, state.clearLines)
+                        states.clearLines(props.propMatrix, clears)
                     })
                 })
             }

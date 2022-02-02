@@ -77,7 +77,7 @@ const utils = {
             data = decodeURIComponent(data)
             data = JSON.parse(data)
 
-            store.state.userSetting = data
+            store.commit('initUserSettings', data)
         } catch (e) {
             if (window.console || window.console.error) {
                 window.console.error('读取记录错误:', e)

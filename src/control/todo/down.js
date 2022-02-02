@@ -16,8 +16,8 @@ const down = store => {
                     return;
                 }
 
-                // 游戏未开始时不允许操作
-                if (state.gameRoom.status != 1) {
+                // 游戏未开始、暂停时不允许操作
+                if (state.gameRoom.status != 1 ||  state.gameRoom.pause) {
                     return
                 }
 

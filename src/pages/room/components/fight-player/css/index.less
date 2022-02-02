@@ -42,6 +42,27 @@
         margin: 3%;
     }
 
+    .clear-tip {
+        opacity: 0;
+        font-size: 3.3rem;
+        position: absolute;
+        width: 94%;
+        text-align: center;
+        top: 40%;
+        color: #f7f7f7;
+        background: rgba(0, 0, 0, 0.199);
+        border-radius: 10px;
+        font-weight: bold;
+        padding: 25px;
+        /* margin: 20px; */
+        margin: 3%;
+        transition: .3s opacity;
+
+        &.show {
+            opacity: 1;
+        }
+    }
+
     .r {
         float: right;
     }

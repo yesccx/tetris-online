@@ -3,7 +3,7 @@
         <!-- 对战玩家 -->
         <div class="flex justify-center">
             <FightPlayer v-for="player in fightPlayers" :key="player.username" :info="player" :style="fightPlayerCss"
-                style="margin:20px;" />
+                style="margin:20px;" :ref="setFightPlayerRefs" />
         </div>
 
         <!-- 玩家 -->
@@ -29,7 +29,7 @@
     import states from '@/control/states'
     import { wsClient as $wsClient } from '@/utils/websocket'
     import { loading, unloading } from '@/utils/common'
-    import { bgmusic } from '@/utils/bgmusic'
+    import { music } from '@/utils/music'
 
     export default defineComponent({
         name: 'page-room',
@@ -46,7 +46,8 @@
                 playerCss: { zoom: 1 },
                 fightPlayerCss: { zoom: 1 },
                 menuShow: false,
-                inited: false
+                inited: false,
+                fightPlayerRefs: {}
             })
 
             // 对战玩家列表
@@ -112,7 +113,7 @@
                     const gameRoom = data.data
                     $store.commit('joinGameRoom', gameRoom)
 
-                    initCallback()
+                    initCallback && initCallback()
                 })
             }
 
@@ -147,29 +148,62 @@
                     })
                 });
 
+                // 游戏设置更新
+                $wsClient.socket('/game')[type]('game-settings', type == 'off' ? undefined : (data) => {
+                    $store.commit('setGameRoomSettings', data)
+                });
+
                 // 游戏开始
                 $wsClient.socket('/game')[type]('game-start', type == 'off' ? undefined : (data) => {
+                    music.start.play()
                     $store.commit('setGameRoomStatus', 1);
                     $store.commit('setGameRoomBlocks', data.blocks);
+                    Toast({ message: 'Ready!!!', overlay: true })
+                    setTimeout(() => {
+                        Toast({ message: 'Go!!!', duration: 300 })
 
-                    states.start();
+                        music.bgmusic && music.bgmusic.play()
+                        states.start();
 
-                    // 开启自动上报游戏数据(每200毫秒)
-                    autoReportFightData(true);
-
-                    bgmusic.start()
+                        // 开启自动上报游戏数据(每200毫秒)
+                        autoReportFightData(true);
+                    }, 1200)
                 });
 
                 // 游戏暂停
                 $wsClient.socket('/game')[type]('game-pause', type == 'off' ? undefined : (data) => {
+                    music.pause && music.pause.play()
+                    music.bgmusic && music.bgmusic.pause()
                     autoReportFightData(false)
                     states.pause(true)
                 });
 
                 // 游戏恢复
                 $wsClient.socket('/game')[type]('game-unpause', type == 'off' ? undefined : (data) => {
+                    music.pause && music.pause.play()
+                    music.bgmusic && music.bgmusic.play()
                     autoReportFightData(true)
                     states.pause(false)
+                });
+
+                // 消除音效
+                $wsClient.socket('/game')[type]('game-block-clear', type == 'off' ? undefined : (data) => {
+                    const currentClearLines = data.lines
+                    const username = data.username
+                    const $el = state.fightPlayerRefs[btoa(username)] || null
+                    if ($el) {
+                        $el.clearPlay(currentClearLines)
+                    }
+
+                    if (currentClearLines == 1) {
+                        music.clear1 && music.clear1.play()
+                    } else if (currentClearLines == 2) {
+                        music.clear2 && music.clear2.play()
+                    } else if (currentClearLines == 3) {
+                        music.clear3 && music.clear3.play()
+                    } else if (currentClearLines == 4) {
+                        music.clear4 && music.clear4.play()
+                    }
                 });
             }
 
@@ -226,9 +260,16 @@
                 });
             }
 
+            const setFightPlayerRefs = (el) => {
+                if (el) {
+                    state.fightPlayerRefs[btoa(el.info.username)] = el
+                }
+            }
+
             return {
                 ...toRefs(state),
                 fightPlayers,
+                setFightPlayerRefs
             };
         }
     })

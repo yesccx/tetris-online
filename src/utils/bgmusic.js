@@ -17,7 +17,7 @@ export const bgmusic = {}
         if (!hasWebAudioAPI.data) {
             return
         }
-        const url = 'http://192.168.2.112:3000/game/static/bgmusic.mp3'
+        const url = '/static/music/bg1.mp3'
         const context = new AudioContext()
         const req = new XMLHttpRequest()
         req.open('GET', url, true)
@@ -36,7 +36,7 @@ export const bgmusic = {}
                         return source
                     }
                     bgmusic.start = () => {
-                        getSource().start(0)
+                        // getSource().start(0)
                     }
                 },
                 error => {

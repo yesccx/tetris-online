@@ -1,24 +1,24 @@
 <template>
     <div class="keyboard" :style="containerCss">
-        <v-button ref="dom_rotate_el" color="blue" :size="useStyleData.rotate.size" arrow="translate(0, 63px)"
-            :top="useStyleData.rotate.top" :left="useStyleData.rotate.left" label="旋转" :position="true"
-            :active="keyboard['rotate']" />
-        <v-button ref="dom_down_el" color="blue" :size="useStyleData.down.size"
-            arrow="translate(0,-71px) rotate(180deg)" :top="useStyleData.down.top" :left="useStyleData.down.left"
-            label="下移" :active="keyboard['down']" />
-        <v-button ref="dom_left_el" color="blue" :size="useStyleData.left.size"
-            arrow="translate(60px, -12px) rotate(270deg)" :top="useStyleData.left.top" :left="useStyleData.left.left"
-            label="左移" :active="keyboard['left']" />
-        <v-button ref="dom_right_el" color="blue" :size="useStyleData.right.size"
-            arrow="translate(-60px, -12px) rotate(90deg)" :top="useStyleData.right.top" :left="useStyleData.right.left"
-            label="右移" :active="keyboard['right']" />
+        <v-button ref="dom_rotate_el" color="blue" :size="useStyleData.rotate.size" :arrow="useStyleData.rotate.arrow"
+            :top="useStyleData.rotate.top" :left="useStyleData.rotate.left" label="旋转"
+            :position="useStyleData.rotate.position" :active="keyboard['rotate']" />
+        <v-button ref="dom_down_el" color="blue" :size="useStyleData.down.size" :arrow="useStyleData.down.arrow"
+            :top="useStyleData.down.top" :left="useStyleData.down.left" label="下移" :active="keyboard['down']" />
+        <v-button ref="dom_left_el" color="blue" :size="useStyleData.left.size" :arrow="useStyleData.left.arrow"
+            :top="useStyleData.left.top" :left="useStyleData.left.left" label="左移" :active="keyboard['left']" />
+        <v-button ref="dom_right_el" color="blue" :size="useStyleData.right.size" :arrow="useStyleData.right.arrow"
+            :top="useStyleData.right.top" :left="useStyleData.right.left" label="右移" :active="keyboard['right']" />
         <v-button ref="dom_space_el" color="blue" :size="useStyleData.space.size" :top="useStyleData.space.top"
-            :left="useStyleData.space.left" label="掉落(SPACE)" :active="keyboard['drop']" />
+            :left="useStyleData.space.left" label="掉落" :active="keyboard['drop']" :arrow="useStyleData.space.arrow"
+            :position="useStyleData.space.position" />
         <v-button ref="dom_multifunction_el" :color="multifunctionButton.color" :size="useStyleData.multifunction.size"
             :top="useStyleData.multifunction.top" :left="useStyleData.multifunction.left"
-            :label="multifunctionButton.label" :active="keyboard['multifunction']" />
-        <v-button ref="dom_setting_el" color="red" :size="useStyleData.setting.size" :top="useStyleData.setting.top"
-            :left="useStyleData.setting.left" label="设置" :active="keyboard['setting']" />
+            :label="multifunctionButton.label" :active="keyboard['multifunction']"
+            :arrow="useStyleData.multifunction.arrow" :position="useStyleData.multifunction.position" />
+        <v-button ref="dom_setting_el" color="green" :size="useStyleData.setting.size" :top="useStyleData.setting.top"
+            :left="useStyleData.setting.left" label="设置" :active="keyboard['setting']"
+            :arrow="useStyleData.setting.arrow" :position="useStyleData.setting.position" />
     </div>
 </template>
 

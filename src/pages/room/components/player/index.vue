@@ -3,7 +3,7 @@
         <div class="rect" :class="drop?'drop':''">
             <!-- Buffer -->
             <div class="buffer-container">
-                <Buffer :count="playerSurplusBuffers" />
+                <Buffer :count="playerSurplusBuffers" :is-over="playerData.isOver" />
             </div>
 
             <div class="screen">
@@ -22,7 +22,7 @@
 
                         <!-- 下落方块 -->
                         <p>下落方块</p>
-                        <Number :number='playerData.blockIndex - 1' />
+                        <Number :number='playerData.blockIndex > 0  ? (playerData.blockIndex - 1) : 0' />
 
                         <!-- 消除行 -->
                         <p>消除行</p>
@@ -113,7 +113,14 @@
                     color: ''
                 }
 
-                if ($store.state.playerData.isReady) {
+                if ($store.state.playerData.isOver) {
+                    data.subtitle = ''
+                    data.color = 'red'
+                    data.title = `已结束`
+                    data.status = true
+                } else if ($store.state.gameRoom.status == 1) {
+                    data.status = false
+                } else if ($store.state.playerData.isReady) {
                     if ($store.getters.gameRoomFightReady) {
                         data.subtitle = '准备就绪！'
                         data.color = 'green'
@@ -123,11 +130,6 @@
                     }
                     data.title = `玩家: ${$store.state.gameRoom.currentCount} / ${$store.state.gameRoom.maxCount}`
                     data.status = true
-                }
-
-                // 游戏开始后不再显示
-                if ($store.state.gameRoom.status == 1) {
-                    data.status = false
                 }
 
                 return data

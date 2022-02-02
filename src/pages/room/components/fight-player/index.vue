@@ -3,7 +3,7 @@
         <div class="rect">
             <!-- Buffer -->
             <div class="buffer-container">
-                <Buffer v-if="info.username" :count="playerSurplusBuffers" />
+                <Buffer v-if="info.username" :count="playerSurplusBuffers" :is-over="info.isOver" />
             </div>
 
             <div class="screen">
@@ -21,7 +21,7 @@
 
                         <!-- 下落方块 -->
                         <p>下落方块</p>
-                        <Number :number='info.blockIndex - 1' />
+                        <Number :number='info.blockIndex > 0  ? (info.blockIndex - 1) : 0' />
 
                         <!-- 消除行 -->
                         <p>消除行</p>
@@ -46,7 +46,10 @@
         </div>
 
         <p v-if="isVacancy" class="vacancy-tip">空缺</p>
-        <p v-show="info.isOver" class="over-tip bg-red-600">已结束</p>
+        <p v-show="info.isOver" class="over-tip bg-yellow-500">已结束</p>
+
+        <!-- 消除提醒 -->
+        <p class="clear-tip" :class="{show: clearTip.show}">{{ clearTip.message }}</p>
     </div>
 </template>
 
@@ -63,6 +66,7 @@
     import Buffer from './buffer/index.vue'
 
     import FightPlayerClass from './utils/fight-player-class'
+    import { Toast } from 'vant'
 
     export default defineComponent({
         name: 'fight-player',
@@ -86,7 +90,13 @@
         },
         setup(props) {
             const $store = useStore()
-            const state = reactive({})
+            const state = reactive({
+                clearTip: {
+                    show: false,
+                    message: '',
+                    timeout: null
+                }
+            })
 
             // 下一个方块
             const nextBlock = computed(() => props.info.nextBlock())
@@ -111,6 +121,20 @@
                 return playerBuffers - info.dischargeBuffers - info.fillBuffers
             })
 
+            // 显示消除行动画
+            const clearPlay = (count) => {
+                if (state.clearTip.timetout) {
+                    clearTimeout(state.clearTip.timetout)
+                }
+
+                state.clearTip.message = `消除${count}行`
+                state.clearTip.show = true
+
+                state.clearTip.timetout = setTimeout(() => {
+                    state.clearTip.show = false
+                }, 800)
+            }
+
             return {
                 ...toRefs(state),
                 ...toRefs(props),
@@ -118,7 +142,8 @@
                 isVacancy,
                 gameRoom,
                 gammeSpeed,
-                playerSurplusBuffers
+                playerSurplusBuffers,
+                clearPlay
             }
         }
     })

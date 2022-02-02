@@ -94,6 +94,7 @@ const mutations = {
         start_lines = 0,
         userinfo = {},
         members = [],
+        mode = 1,
     }) {
         // 房间信息
         state.gameRoom.number = number;
@@ -105,6 +106,7 @@ const mutations = {
         state.gameRoom.blocks = blocks;
         state.gameRoom.speedStart = speed_start;
         state.gameRoom.startLines = start_lines;
+        state.gameRoom.mode = mode;
 
         // 初始化房间成员
         this.commit('initGameRoomMembers', members);
@@ -190,14 +192,21 @@ const mutations = {
                 cur: info?.cur ? JSON.parse(info.cur) : null,
             })
         }
+
+        state.gameRoom.currentCount = members.length
     },
     // 设置当前房间状态
     setGameRoomStatus(state, status) {
         state.gameRoom.status = status
     },
-    // 设置当前blocks
+    // 设置当前房间blocks
     setGameRoomBlocks(state, blocks) {
         state.gameRoom.blocks = blocks
+    },
+    // 设置当前房间配置
+    setGameRoomSettings(state, data) {
+        state.gameRoom.speedStart = data?.speed_start || state.gameRoom.speedStart
+        state.gameRoom.mode = data?.mode || state.gameRoom.mode
     },
     // 服务器连接状态
     setServerStatus(state, status) {
@@ -206,6 +215,14 @@ const mutations = {
     // 设置 用户设置项-布局风格
     setUserSettingLayoutStyle(state, layoutStyle) {
         state.userSetting.layoutStyle = layoutStyle
+    },
+    // 设置 用户设置项-背景音乐音量变更
+    setUserSettingBgmVolume(state, bgmVolume) {
+        state.userSetting.bgmVolume = bgmVolume
+    },
+    // 设置 用户设置项-游戏音效音量变更
+    setUserSettingSoundVolume(state, soundVolume) {
+        state.userSetting.soundVolume = soundVolume
     },
     // 设置 玩家数据-准备状态
     setPlayerReadyStatus(state, status) {
@@ -223,5 +240,11 @@ const mutations = {
     setPlayerOverStatus(state, data) {
         state.playerData.isOver = data;
     },
+    // 初始化用户设置
+    initUserSettings(state, data) {
+        state.userSetting.layoutStyle = data?.layoutStyle || 'style1'
+        state.userSetting.bgmVolume = data?.bgmVolume || 50
+        state.userSetting.soundVolume = data?.soundVolume || 60
+    }
 }
 export default mutations

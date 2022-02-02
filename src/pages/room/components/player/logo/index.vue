@@ -1,7 +1,7 @@
 <template>
     <div class="logo" :style="{ display: display }">
         <div class="bg dragon" :class="animateClassName" />
-        <p class="text-white" :class="titleColorClass" style="background-color: #46982f; border-radius: 10px; padding: 10px;">
+        <p class="text-white" :class="titleColorClass" style="border-radius: 10px; padding: 10px;">
             <span>{{ title }}</span>
             <span v-show="subtitle">
                 <br />

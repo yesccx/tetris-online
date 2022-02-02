@@ -7,6 +7,8 @@ import {
     clearPoints,
     eachLines
 } from '@/utils/constant'
+import { music } from '@/utils/music'
+import { wsClient as $wsClient } from '@/utils/websocket'
 
 const getStartMatrix = startLines => {
     // 生成startLines
@@ -59,9 +61,13 @@ const getBufferMatrix = (matrix, count) => {
         return line
     }
     let bufferMatrix = JSON.parse(JSON.stringify(matrix))
+    // 寻找上一个缺口位置
+    const lastPosition = bufferMatrix.slice(-1)[0].indexOf(0)
+    const position = lastPosition >= 0 ? lastPosition : parseInt(Math.random() * 10)
+
     bufferMatrix.splice(0, count)
     for (let i = 0; i < count; i++) {
-        bufferMatrix.push(getLine(1))
+        bufferMatrix.push(getLine(position))
     }
 
     return bufferMatrix
@@ -208,6 +214,17 @@ const states = {
         const currentClearLines = lines.length
         const clearLines = state.playerData.clearLines + currentClearLines
         store.commit('clearLines', clearLines)
+
+        if (currentClearLines == 1) {
+            music.clear1 && music.clear1.play()
+        } else if (currentClearLines == 2) {
+            music.clear2 && music.clear2.play()
+        } else if (currentClearLines == 3) {
+            music.clear3 && music.clear3.play()
+        } else if (currentClearLines == 4) {
+            music.clear4 && music.clear4.play()
+        }
+        $wsClient.socket('/game').emit('game-block-clear', currentClearLines)
 
         const addPoints = store.state.playerData.points + clearPoints[currentClearLines - 1] // 一次消除的行越多, 加分越多
         states.dispatchPoints(addPoints)

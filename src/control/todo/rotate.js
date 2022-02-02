@@ -11,17 +11,17 @@ const down = store => {
         callback: () => {
             const state = store.state
 
-            music.rotate()
-
             // 锁定状态时不允许操作
             if (state.lock) {
                 return;
             }
 
-            // 游戏未开始时不允许操作
-            if (state.gameRoom.status != 1) {
+            // 游戏未开始、暂停时不允许操作
+            if (state.gameRoom.status != 1 ||  state.gameRoom.pause) {
                 return
             }
+
+            music.rotate && music.rotate.play()
 
             // 当前不存在方块时不允许操作
             const cur = state.playerData.cur

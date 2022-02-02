@@ -29,6 +29,8 @@ const state = {
     // 用户设置
     userSetting: {
         layoutStyle: 'style1',
+        bgmVolume: 50,
+        soundVolume: 60
     },
 
     // 当前游戏房间
@@ -41,7 +43,8 @@ const state = {
         maxCount: 0,
         blocks: [],
         speedStart: 1,
-        startLines: 0
+        startLines: 0,
+        mode: 1
     },
 
     // 当前游戏房间成员

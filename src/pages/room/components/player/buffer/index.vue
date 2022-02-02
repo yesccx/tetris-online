@@ -1,25 +1,50 @@
 <template>
     <div class="buffer">
-        <div class="wrapper" :class="{fill: count >= 1}"></div>
-        <div class="wrapper" :class="{fill: count >= 2}"></div>
-        <div class="wrapper" :class="{fill: count >= 3}"></div>
-        <div class="wrapper" :class="{fill: count >= 4}"></div>
-        <div class="wrapper" :class="{fill: count >= 5}"></div>
+        <div class="wrapper" :class="{fill: realCount >= 1}"></div>
+        <div class="wrapper" :class="{fill: realCount >= 2}"></div>
+        <div class="wrapper" :class="{fill: realCount >= 3}"></div>
+        <div class="wrapper" :class="{fill: realCount >= 4}"></div>
+        <div class="wrapper" :class="{fill: realCount >= 5}"></div>
     </div>
 </template>
 
 <script>
-    import { defineComponent } from 'vue'
+    import { music } from '@/utils/music'
+    import { defineComponent, reactive, toRefs, watch } from 'vue'
 
     export default defineComponent({
         props: {
             count: {
                 type: Number,
                 default: 0
+            },
+            isOver: {
+                type: Boolean,
+                default: false
             }
         },
-        setup() {
+        setup(props) {
+            const state = reactive({
+                realCount: 0
+            })
 
+            watch(() => props.count, (newValue, oldValue) => {
+                if (!props.isOver && newValue > oldValue) {
+                    music.buffer && music.buffer.play()
+                }
+            })
+
+            watch(() => props.count, (newValue, oldValue) => {
+                if (!props.isOver) {
+                    state.realCount = newValue
+                }
+            }, {
+                immediate: true
+            })
+
+            return {
+                ...toRefs(state)
+            }
         },
     })
 </script>
