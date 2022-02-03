@@ -42,14 +42,16 @@
             </div>
 
             <!-- 用户名 -->
-            <Username :is-owner="info.isOwner" :username="info.username" />
+            <Username :is-owner="info.isOwner" :username="info.username" :team="info.team" />
         </div>
 
         <p v-if="isVacancy" class="vacancy-tip">空缺</p>
         <p v-show="info.isOver" class="over-tip bg-yellow-500">已结束</p>
 
         <!-- 消除提醒 -->
-        <p class="clear-tip" :class="{show: clearTip.show}">{{ clearTip.message }}</p>
+        <transition name="van-slide-down">
+            <p class="clear-tip" v-show="clearTip.show">{{ clearTip.message }}</p>
+        </transition>
     </div>
 </template>
 
@@ -66,7 +68,6 @@
     import Buffer from './buffer/index.vue'
 
     import FightPlayerClass from './utils/fight-player-class'
-    import { Toast } from 'vant'
 
     export default defineComponent({
         name: 'fight-player',
@@ -78,7 +79,7 @@
             Pause,
             Username,
             Point,
-            Buffer,
+            Buffer
         },
         props: {
             // 对战玩家信息

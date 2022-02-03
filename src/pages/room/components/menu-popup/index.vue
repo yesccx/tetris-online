@@ -33,11 +33,11 @@
                         <van-icon name="manager" /> 队伍
                     </template>
                     <template #input>
-                        <van-radio-group v-model="team" direction="horizontal">
-                            <van-radio name="红" checked-color="red">红</van-radio>
-                            <van-radio name="黄" checked-color="#dede29">黄</van-radio>
-                            <van-radio name="蓝" checked-color="blue">蓝</van-radio>
-                            <van-radio name="绿" checked-color="green">绿</van-radio>
+                        <van-radio-group v-model="team" direction="horizontal" @change="onTeamChange">
+                            <van-radio :name="1" checked-color="red">红</van-radio>
+                            <van-radio :name="2" checked-color="#8229d1">紫</van-radio>
+                            <van-radio :name="3" checked-color="blue">蓝</van-radio>
+                            <van-radio :name="4" checked-color="green">绿</van-radio>
                         </van-radio-group>
                     </template>
                 </van-field>
@@ -171,6 +171,13 @@
                 deep: true,
                 immediate: true
             })
+            // 玩家设置变更
+            watch(() => $store.state.playerData, (data) => {
+                state.team = data.team
+            }, {
+                deep: true,
+                immediate: true
+            })
 
             onMounted(() => {
                 console.log($store.state.userSetting)
@@ -220,6 +227,20 @@
                 })
             }
 
+            // 事件: 队伍更新
+            const onTeamChange = () => {
+                const team = state.team
+                loading()
+                $wsClient.socket('/game').emit('player-settings', {
+                    'team': team,
+                }, (data) => {
+                    unloading()
+                    if (data.success) {
+                        $store.commit('setPlayerTeam', team)
+                    }
+                })
+            }
+
             return {
                 ...toRefs(state),
                 ...toRefs(props),
@@ -228,6 +249,7 @@
                 onBgmVolumeChange,
                 onSoundVolumeChange,
                 onSettingsChange,
+                onTeamChange,
                 gameRoomSetting: computed(() => $store.state.playerData.isOwner && $store.state.gameRoom.status != 1)
             }
         }

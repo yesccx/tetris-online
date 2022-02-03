@@ -144,6 +144,7 @@ const mutations = {
         state.playerData.clearLines = data?.clear_lines || 0
         state.playerData.matrix = data?.matrix || blankMatrix
         state.playerData.buffers = data?.buffers || []
+        state.playerData.team = data?.team || 1
     },
     // 初始化房间成员
     initGameRoomMembers(state, members = []) {
@@ -168,6 +169,7 @@ const mutations = {
                 isReady: Boolean(info?.is_ready || false),
                 isOver: Boolean(info?.is_over || false),
                 cur: info?.cur ? JSON.parse(info.cur) : null,
+                team: info?.team || 1,
             })
         })
 
@@ -190,6 +192,7 @@ const mutations = {
                 isReady: Boolean(info?.is_ready || false),
                 isOver: Boolean(info?.is_over || false),
                 cur: info?.cur ? JSON.parse(info.cur) : null,
+                team: info?.team || 1,
             })
         }
 
@@ -245,6 +248,10 @@ const mutations = {
         state.userSetting.layoutStyle = data?.layoutStyle || 'style1'
         state.userSetting.bgmVolume = data?.bgmVolume || 50
         state.userSetting.soundVolume = data?.soundVolume || 60
-    }
+    },
+    // 设置 玩家数据-队伍
+    setPlayerTeam(state, data) {
+        state.playerData.team = data;
+    },
 }
 export default mutations

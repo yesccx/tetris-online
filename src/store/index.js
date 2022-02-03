@@ -62,7 +62,8 @@ const state = {
         clearLines: 0,
         matrix: blankMatrix,
         dischargeBuffers: 0,
-        fillBuffers: 0
+        fillBuffers: 0,
+        team: 1
     },
 
     // 服务器连接状态

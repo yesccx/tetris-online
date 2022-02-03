@@ -41,6 +41,9 @@
                     </div>
                 </div>
             </div>
+
+            <!-- 用户名 -->
+            <Username :is-owner="playerData.isOwner" :team="playerData.team" />
         </div>
 
         <Keyboard :filling='filling' :cur="!!playerData.cur" />
@@ -62,6 +65,7 @@
     import Pause from './pause/index.vue'
     import Point from './point/index.vue'
     import Buffer from './buffer/index.vue'
+    import Username from './username/index.vue'
 
     import { Progress } from 'vant'
 
@@ -76,6 +80,7 @@
             Pause,
             Point,
             Buffer,
+            Username,
             [Progress.name]: Progress
         },
         setup() {

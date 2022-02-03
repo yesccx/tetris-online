@@ -10,6 +10,7 @@ class FightPlayerClass {
     speedRun = 1
     dischargeBuffers = 0
     fillBuffers = 0
+    team = 1
 
     // 是否房主
     isOwner = false

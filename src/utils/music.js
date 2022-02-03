@@ -59,7 +59,7 @@ export const music = {};
     })
 
     music.bgmusic = new Howl({
-        src: ['/static/music/bg1.mp3'],
+        src: ['/static/music/bg2.mp3'],
         loop: true
     })
 })()

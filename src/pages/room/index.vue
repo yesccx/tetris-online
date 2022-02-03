@@ -190,7 +190,7 @@
                 $wsClient.socket('/game')[type]('game-block-clear', type == 'off' ? undefined : (data) => {
                     const currentClearLines = data.lines
                     const username = data.username
-                    const $el = state.fightPlayerRefs[btoa(username)] || null
+                    const $el = state.fightPlayerRefs[username] || null
                     if ($el) {
                         $el.clearPlay(currentClearLines)
                     }
@@ -262,7 +262,7 @@
 
             const setFightPlayerRefs = (el) => {
                 if (el) {
-                    state.fightPlayerRefs[btoa(el.info.username)] = el
+                    state.fightPlayerRefs[el.info.username] = el
                 }
             }
 
