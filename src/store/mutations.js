@@ -132,19 +132,17 @@ const mutations = {
     },
     // 设置 玩家数据
     setPlayerData(state, data) {
-        const matrix = data?.matrix
         state.playerData.points = data?.points || 0
         state.playerData.isOwner = Boolean(data?.is_owner || 0)
         state.playerData.isReady = Boolean(data?.is_ready || 0)
         state.playerData.isOver = Boolean(data?.is_over || 0)
         state.playerData.blockIndex = data?.block_index || 0
-        state.playerData.cur = data?.cur ? JSON.parse(data.cur): null
+        state.playerData.cur = (data?.cur && data.cur != 'null') ? new Block(JSON.parse(data.cur)) : null
         state.playerData.dischargeBuffers = data?.discharge_buffers || 0
         state.playerData.fillBuffers = data?.fill_buffers || 0
         state.playerData.speedRun = data?.speed_run || 1
         state.playerData.clearLines = data?.clear_lines || 0
-        state.playerData.matrix = data?.matrix ? JSON.parse(data.matrix): blankMatrix
-        state.playerData.buffers = data?.buffers ? JSON.parse(data.buffers): []
+        state.playerData.matrix = (data?.matrix && data.matrix != 'null') ? JSON.parse(data.matrix) : blankMatrix
         state.playerData.team = data?.team || 1
     },
     // 初始化房间成员
@@ -170,6 +168,7 @@ const mutations = {
                 isReady: Boolean(info?.is_ready || false),
                 isOver: Boolean(info?.is_over || false),
                 isOnline: Boolean(info?.is_online || false),
+                isQuit: Boolean(info?.is_quit || false),
                 cur: info?.cur ? JSON.parse(info.cur) : null,
                 team: info?.team || 1,
             })
@@ -194,6 +193,7 @@ const mutations = {
                 isReady: Boolean(info?.is_ready || false),
                 isOver: Boolean(info?.is_over || false),
                 isOnline: Boolean(info?.is_online || false),
+                isQuit: Boolean(info?.is_quit || false),
                 cur: info?.cur ? JSON.parse(info.cur) : null,
                 team: info?.team || 1,
             })

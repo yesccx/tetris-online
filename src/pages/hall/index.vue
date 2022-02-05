@@ -61,20 +61,16 @@
                         Dialog.confirm({
                             title: '提醒',
                             message: '上次游戏还没结束，是否返回房间？',
+                            confirmButtonText: '继续游戏',
+                            cancelButtonText: '不再提醒',
                         }).then(() => {
                             unloading()
 
-                            // 加入房间
-                            $wsClient.socket('/game').emit('join-last-room', (data) => {
-                                if (!data['success']) {
-                                    return setTimeout(() => {
-                                        Toast.fail(data['message'] || '未知错误')
-                                    }, 0);
-                                }
-
-                                // 前往房间
-                                $router.push({ name: 'room', params: { number: roomNumber } })
-                            });
+                            // 前往房间
+                            $router.push({ name: 'room', params: { number: roomNumber } })
+                        }).catch(() => {
+                            // 退出房间
+                            $wsClient.socket('/game').emit('leave-room')
                         })
                     }
                 })

@@ -20,6 +20,10 @@
             isOver: {
                 type: Boolean,
                 default: false
+            },
+            isQuit: {
+                type: Boolean,
+                default: false
             }
         },
         setup(props) {
@@ -29,7 +33,7 @@
 
             watch(() => props.count, (newValue, oldValue) => {
                 newValue = parseInt(newValue)
-                if (!props.isOver) {
+                if (!props.isOver && !props.isQuit) {
                     state.realCount = newValue
                 }
             }, {

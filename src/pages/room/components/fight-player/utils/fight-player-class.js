@@ -21,11 +21,14 @@ class FightPlayerClass {
     // 是否已结束
     isOver = false
 
+    // 在线状态
+    isOnline = false
+
+    // 退出状态
+    isQuit = false
+
     // 当前下落的方块
     cur = null
-
-    // 在线状态
-    online = false
 
     constructor(attributes) {
         this.fill(attributes)

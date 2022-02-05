@@ -17,7 +17,7 @@
 </template>
 
 <script>
-    import { defineComponent, reactive, onMounted, computed, onUnmounted, toRefs, watch } from 'vue'
+    import { defineComponent, reactive, onMounted, computed, onUnmounted, toRefs, watch, nextTick } from 'vue'
     import { useStore } from 'vuex'
     import { useRoute, useRouter } from 'vue-router'
 
@@ -76,6 +76,25 @@
 
                     // 初始化刷新成员列表
                     flushMemberList();
+
+                    // 再次加入房间
+                    if ($store.state.gameRoom.status == 1) {
+                        nextTick(() => {
+                            $wsClient.socket('/game').emit('join-last-room', (data) => {
+                                if (!data['success']) {
+                                    return setTimeout(() => {
+                                        Toast.fail(data['message'] || '未知错误')
+                                    }, 0);
+                                }
+                            });
+
+                            if (!$store.state.gameRoom.pause) {
+                                music.bgmusic && music.bgmusic.play()
+                                autoReportFightData(true)
+                                states.pause(false)
+                            }
+                        })
+                    }
                 })
             })
 
@@ -89,6 +108,7 @@
                 $store.state.reset = false
                 $store.state.drop = false
                 $store.state.lock = false
+                music.bgmusic && music.bgmusic.stop()
             })
 
             // 初始化房间信息
@@ -241,8 +261,8 @@
                             speed_run: playerData.speedRun,
                             clear_lines: playerData.clearLines,
                             matrix: JSON.stringify(playerData.matrix),
-                            discharge_buffers: JSON.stringify(playerData.dischargeBuffers),
-                            fill_buffers: JSON.stringify(playerData.fillBuffers),
+                            discharge_buffers: playerData.dischargeBuffers,
+                            fill_buffers: playerData.fillBuffers,
                         });
                         flushMemberList();
                     }, 30);

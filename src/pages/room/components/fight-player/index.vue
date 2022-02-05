@@ -1,9 +1,10 @@
 <template>
-    <div class="fight-player" :class="{vacancy: isVacancy || info.isOver}">
+    <div class="fight-player" :class="{vacancy: isVacancy || info.isOver || info.isQuit || !info.isOnline}">
         <div class="rect">
             <!-- Buffer -->
             <div class="buffer-container">
-                <Buffer v-if="info.username" :count="playerSurplusBuffers" :is-over="info.isOver" />
+                <Buffer v-if="info.username" :count="playerSurplusBuffers" :is-over="info.isOver"
+                    :is-quit="info.isQuit" />
             </div>
 
             <div class="screen">
@@ -46,6 +47,7 @@
         </div>
 
         <p v-if="isVacancy" class="vacancy-tip">空缺</p>
+        <p v-else-if="info.isQuit" class="over-tip bg-red-500">已退出</p>
         <p v-else-if="!info.isOnline" class="over-tip bg-red-500">已离线</p>
         <p v-else-if="info.isOver" class="over-tip bg-yellow-500">已结束</p>
 

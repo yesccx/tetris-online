@@ -94,7 +94,8 @@ const getters = {
     },
     // 消除行的倍率
     clearLevel(state) {
-        return state.gameRoom.currentCount > 2 ? 0.5 : 1
+        let players = state.gameRoomMembers.filter((player) => player.username)
+        return players.length > 2 ? 0.5 : 1
     }
 }
 
