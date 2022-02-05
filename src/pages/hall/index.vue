@@ -21,7 +21,9 @@
     import RoomList from './components/room-list.vue';
 
     import { wsClient as $wsClient } from '@/utils/websocket'
-    import { music } from '@/utils/music';
+    import { Dialog, Toast } from 'vant';
+    import { loading, unloading } from '@/utils/common';
+    import { useRouter } from 'vue-router';
 
     export default defineComponent({
         name: 'page-hall',
@@ -31,6 +33,7 @@
             RoomList,
         },
         setup() {
+            const $router = useRouter()
             const state = reactive({
                 // 在线人数
                 onlineCount: 0
@@ -40,11 +43,42 @@
                 socketListen('on');
 
                 flushOnlineCount();
+
+                checkLastRoom()
             });
 
             onUnmounted(() => {
                 socketListen('off')
             })
+
+            // 检测上一个房间
+            const checkLastRoom = () => {
+                loading()
+                $wsClient.socket('/game').emit('room-info', (data) => {
+                    unloading()
+                    if (data.success && data.data.status == 1) {
+                        const roomNumber = data.data.number
+                        Dialog.confirm({
+                            title: '提醒',
+                            message: '上次游戏还没结束，是否返回房间？',
+                        }).then(() => {
+                            unloading()
+
+                            // 加入房间
+                            $wsClient.socket('/game').emit('join-last-room', (data) => {
+                                if (!data['success']) {
+                                    return setTimeout(() => {
+                                        Toast.fail(data['message'] || '未知错误')
+                                    }, 0);
+                                }
+
+                                // 前往房间
+                                $router.push({ name: 'room', params: { number: roomNumber } })
+                            });
+                        })
+                    }
+                })
+            }
 
             // socket监听
             const socketListen = (type = 'on') => {

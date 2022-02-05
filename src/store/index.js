@@ -81,16 +81,20 @@ const getters = {
         return state.gameRoomMembers.every((player) => !player.username || player.isReady)
     },
     // playerBuffers
-    playerBuffers(state) {
-        const players = state.gameRoomMembers.filter((player) => player.username != state.userSession.username).slice(0, 3);
+    playerBuffers(state, getters) {
+        const players = state.gameRoomMembers.filter((player) => player.team != state.playerData.team);
         const value = players.reduce((previousValue, current) => {
-            return previousValue + (current?.clearLines || 0)
+            return previousValue + (current?.clearLines || 0) * getters.clearLevel
         }, 0);
         return value
     },
     // playerSurplusBuffers
     playerSurplusBuffers(state, getters) {
         return getters.playerBuffers - state.playerData.dischargeBuffers - state.playerData.fillBuffers
+    },
+    // 消除行的倍率
+    clearLevel(state) {
+        return state.gameRoom.currentCount > 2 ? 0.5 : 1
     }
 }
 

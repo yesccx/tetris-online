@@ -29,6 +29,7 @@
             })
 
             watch(() => props.count, (newValue, oldValue) => {
+                newValue = parseInt(newValue)
                 if (!props.isOver && newValue > oldValue) {
                     music.buffer && music.buffer.play()
                 }

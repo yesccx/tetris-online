@@ -231,7 +231,7 @@ const states = {
 
         // 抵销buffers
         if (store.getters.playerBuffers > 0) {
-            const afterDischargeBuffers = store.state.playerData.dischargeBuffers + currentClearLines
+            const afterDischargeBuffers = store.state.playerData.dischargeBuffers + currentClearLines * store.getters.clearLevel
             const playerBuffers = store.getters.playerBuffers
             store.commit(
                 'setPlayerDischargeBuffers',
@@ -281,10 +281,12 @@ const states = {
     getBufferMatrix,
     // 填充玩家剩余buffers
     fillPlayerSurplusBuffers: () => {
-        const playerSurplusBuffers = store.getters.playerSurplusBuffers
+        const playerSurplusBuffers = parseInt(store.getters.playerSurplusBuffers)
         const fillBuffers = store.state.playerData.fillBuffers
-        store.commit('matrix', getBufferMatrix(store.state.playerData.matrix, playerSurplusBuffers))
-        store.commit('setPlayerFillBuffers', fillBuffers + playerSurplusBuffers)
+        if (playerSurplusBuffers > 0) {
+            store.commit('matrix', getBufferMatrix(store.state.playerData.matrix, playerSurplusBuffers))
+            store.commit('setPlayerFillBuffers', fillBuffers + playerSurplusBuffers)
+        }
     }
 }
 

@@ -24,6 +24,9 @@ class FightPlayerClass {
     // 当前下落的方块
     cur = null
 
+    // 在线状态
+    online = false
+
     constructor(attributes) {
         this.fill(attributes)
     }

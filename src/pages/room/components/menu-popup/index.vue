@@ -180,7 +180,6 @@
             })
 
             onMounted(() => {
-                console.log($store.state.userSetting)
                 state.controllerStyle = $store.state.userSetting.layoutStyle
                 state.bgmVolume = $store.state.userSetting.bgmVolume
                 state.soundVolume = $store.state.userSetting.soundVolume

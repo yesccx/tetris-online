@@ -46,7 +46,8 @@
         </div>
 
         <p v-if="isVacancy" class="vacancy-tip">空缺</p>
-        <p v-show="info.isOver" class="over-tip bg-yellow-500">已结束</p>
+        <p v-else-if="!info.isOnline" class="over-tip bg-red-500">已离线</p>
+        <p v-else-if="info.isOver" class="over-tip bg-yellow-500">已结束</p>
 
         <!-- 消除提醒 -->
         <transition name="van-slide-down">
@@ -114,9 +115,9 @@
             // playerSurplusBuffers
             const playerSurplusBuffers = computed(() => {
                 const info = props.info
-                const players = $store.state.gameRoomMembers.filter((player) => player.username != info.username).slice(0, 3);
+                const players = $store.state.gameRoomMembers.filter((player) => player.team != info.team);
                 const playerBuffers = players.reduce((previousValue, current) => {
-                    return previousValue + (current?.clearLines || 0)
+                    return previousValue + (current?.clearLines || 0) * $store.getters.clearLevel
                 }, 0);
 
                 return playerBuffers - info.dischargeBuffers - info.fillBuffers

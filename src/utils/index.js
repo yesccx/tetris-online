@@ -46,6 +46,10 @@ const utils = {
     },
 
     isClear(matrix) {
+        if (!matrix) {
+            return false
+        }
+
         // 是否达到消除状态
         const clearLines = []
         matrix.forEach((m, k) => {

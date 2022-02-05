@@ -28,6 +28,7 @@
             })
 
             watch(() => props.count, (newValue, oldValue) => {
+                newValue = parseInt(newValue)
                 if (!props.isOver) {
                     state.realCount = newValue
                 }
