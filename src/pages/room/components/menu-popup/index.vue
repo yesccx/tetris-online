@@ -10,7 +10,7 @@
                     <template #input>
                         <van-radio-group v-model="mode" direction="horizontal" :disabled="!gameRoomSetting"
                             @change="onSettingsChange">
-                            <van-radio :name="1">积分</van-radio>
+                            <van-radio :name="1" disabled>积分</van-radio>
                             <van-radio :name="2">生存</van-radio>
                         </van-radio-group>
                     </template>
@@ -33,7 +33,7 @@
                         <van-icon name="manager" /> 队伍
                     </template>
                     <template #input>
-                        <van-radio-group v-model="team" direction="horizontal" @change="onTeamChange">
+                        <van-radio-group v-model="team" direction="horizontal" @change="onTeamChange" :disabled="!playerSetting">
                             <van-radio :name="1" checked-color="red">红</van-radio>
                             <van-radio :name="2" checked-color="#8229d1">紫</van-radio>
                             <van-radio :name="3" checked-color="blue">蓝</van-radio>
@@ -249,7 +249,8 @@
                 onSoundVolumeChange,
                 onSettingsChange,
                 onTeamChange,
-                gameRoomSetting: computed(() => $store.state.playerData.isOwner && $store.state.gameRoom.status != 1)
+                gameRoomSetting: computed(() => $store.state.playerData.isOwner && $store.state.gameRoom.status != 1),
+                playerSetting: computed(() => $store.state.gameRoom.status != 1)
             }
         }
     }

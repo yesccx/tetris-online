@@ -171,6 +171,7 @@ const mutations = {
                 isQuit: Boolean(info?.is_quit || false),
                 cur: info?.cur ? JSON.parse(info.cur) : null,
                 team: info?.team || 1,
+                overTime: info?.over_time || 0,
             })
         })
 
@@ -196,6 +197,7 @@ const mutations = {
                 isQuit: Boolean(info?.is_quit || false),
                 cur: info?.cur ? JSON.parse(info.cur) : null,
                 team: info?.team || 1,
+                overTime: info?.over_time || 0,
             })
         }
 
@@ -256,5 +258,9 @@ const mutations = {
     setPlayerTeam(state, data) {
         state.playerData.team = data;
     },
+    // 标记游戏结束
+    setGameOver(state) {
+        state.gameRoom.status = 0
+    }
 }
 export default mutations

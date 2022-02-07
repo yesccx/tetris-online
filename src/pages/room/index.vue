@@ -14,6 +14,9 @@
 
     <!-- 设置面板 -->
     <MenuPopup v-model:show="menuShow" />
+
+    <!-- 结算面板 -->
+    <SettlementPopup v-model:show="settlementShow" />
 </template>
 
 <script>
@@ -24,6 +27,7 @@
     import Player from './components/player/index.vue'
     import FightPlayer from './components/fight-player/index.vue'
     import MenuPopup from './components/menu-popup/index.vue'
+    import SettlementPopup from './components/settlement-popup/index.vue'
     import { Toast, Dialog } from 'vant'
 
     import states from '@/control/states'
@@ -36,7 +40,8 @@
         components: {
             Player,
             FightPlayer,
-            MenuPopup
+            MenuPopup,
+            SettlementPopup,
         },
         setup() {
             const $store = useStore()
@@ -46,6 +51,7 @@
                 playerCss: { zoom: 1 },
                 fightPlayerCss: { zoom: 1 },
                 menuShow: false,
+                settlementShow: false,
                 inited: false,
                 fightPlayerRefs: {}
             })
@@ -225,6 +231,27 @@
                         music.clear4 && music.clear4.play()
                     }
                 });
+
+                // 游戏结束
+                $wsClient.socket('/game')[type]('game-over', type == 'off' ? undefined : (data) => {
+                    // 标记游戏结束
+                    $store.commit('setGameOver')
+
+                    // 播放音乐
+                    music.bgmusic && music.bgmusic.stop()
+                    music.win && music.win.play()
+
+                    // 停止上报
+                    autoReportFightData(false)
+
+                    loading()
+                    flushMemberList(() => {
+                        unloading()
+
+                        // 显示结算面板
+                        state.settlementShow = true
+                    })
+                });
             }
 
             // 自适应屏幕大小
@@ -270,13 +297,14 @@
             }
 
             // 刷新成员列表
-            const flushMemberList = () => {
+            const flushMemberList = (callback) => {
                 $wsClient.socket('/game').emit('room-member-list', (data) => {
                     if (!data.success) {
                         return false;
                     }
 
                     $store.commit('setGameRoomMembers', data.data);
+                    callback && callback()
                 });
             }
 

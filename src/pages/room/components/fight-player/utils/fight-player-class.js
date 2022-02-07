@@ -30,6 +30,9 @@ class FightPlayerClass {
     // 当前下落的方块
     cur = null
 
+    // 结束时间
+    overTime = 0
+
     constructor(attributes) {
         this.fill(attributes)
     }
