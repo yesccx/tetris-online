@@ -2646,6 +2646,11 @@ p-map@^4.0.0:
   dependencies:
     aggregate-error "^3.0.0"
 
+pako@^2.0.4:
+  version "2.0.4"
+  resolved "https://registry.npmmirror.com/pako/-/pako-2.0.4.tgz#6cebc4bbb0b6c73b0d5b8d7e8476e2b2fbea576d"
+  integrity sha512-v8tweI900AUkZN6heMU/4Uy4cXRc2AYNRggVmTR+dEncawDJgCdLMximOVA2p4qO57WMynangsfGRb5WD6L1Bg==
+
 param-case@^3.0.4:
   version "3.0.4"
   resolved "https://registry.npm.taobao.org/param-case/download/param-case-3.0.4.tgz?cache=0&sync_timestamp=1606869855388&other_urls=https%3A%2F%2Fregistry.npm.taobao.org%2Fparam-case%2Fdownload%2Fparam-case-3.0.4.tgz#7d17fe4aa12bde34d4a77d91acfb6219caad01c5"

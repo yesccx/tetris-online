@@ -11,7 +11,7 @@ export default defineConfig({
             resolves: [VantResolve()],
         }),
     ],
-    base: "/game/",
+    base: "",
     resolve: {
         alias: {
             '@': path.resolve(__dirname, 'src')

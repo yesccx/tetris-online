@@ -35,6 +35,8 @@
     import { loading, unloading } from '@/utils/common'
     import { music } from '@/utils/music'
 
+    import { unzip, zip } from '@/utils/gzip'
+
     export default defineComponent({
         name: 'page-room',
         components: {
@@ -293,27 +295,28 @@
 
                 if (status == true) {
                     reportInterval = setInterval(() => {
-                        $wsClient.socket('/game').emit('game-data-report', {
-                            points: playerData.points,
-                            is_owner: playerData.isOwner ? 1 : 0,
-                            is_ready: playerData.isReady ? 1 : 0,
-                            is_over: playerData.isOver ? 1 : 0,
-                            block_index: playerData.blockIndex,
-                            cur: JSON.stringify(playerData.cur),
-                            speed_run: playerData.speedRun,
-                            clear_lines: playerData.clearLines,
-                            matrix: JSON.stringify(playerData.matrix),
-                            discharge_buffers: playerData.dischargeBuffers,
-                            fill_buffers: playerData.fillBuffers,
-                        });
+                        $wsClient.socket('/game').emit('game-data-report', zip([
+                            playerData.points,
+                            playerData.isOwner ? 1 : 0,
+                            playerData.isReady ? 1 : 0,
+                            playerData.isOver ? 1 : 0,
+                            playerData.blockIndex,
+                            JSON.stringify(playerData.cur),
+                            playerData.speedRun,
+                            playerData.clearLines,
+                            JSON.stringify(playerData.matrix),
+                            playerData.dischargeBuffers,
+                            playerData.fillBuffers,
+                        ]));
                         flushMemberList();
-                    }, 30);
+                    }, 60);
                 }
             }
 
             // 刷新成员列表
             const flushMemberList = (callback) => {
-                $wsClient.socket('/game').emit('room-member-list', (data) => {
+                $wsClient.socket('/game').emit('room-member-list', (rawData) => {
+                    const data = unzip(rawData)
                     if (!data.success) {
                         return false;
                     }
