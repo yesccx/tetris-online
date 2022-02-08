@@ -33,7 +33,8 @@
                         <van-icon name="manager" /> 队伍
                     </template>
                     <template #input>
-                        <van-radio-group v-model="team" direction="horizontal" @change="onTeamChange" :disabled="!playerSetting">
+                        <van-radio-group v-model="team" direction="horizontal" @change="onTeamChange"
+                            :disabled="!playerSetting">
                             <van-radio :name="1" checked-color="red">红</van-radio>
                             <van-radio :name="2" checked-color="#8229d1">紫</van-radio>
                             <van-radio :name="3" checked-color="blue">蓝</van-radio>

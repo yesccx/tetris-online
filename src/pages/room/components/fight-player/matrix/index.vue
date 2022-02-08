@@ -23,6 +23,10 @@
             username: {
                 type: String,
                 default: ''
+            },
+            gameStatus: {
+                type: Number,
+                default: 0
             }
         },
         setup(props, { expose }) {
@@ -124,7 +128,7 @@
 
             watch(props, (newValue, oldValue) => {
                 // 玩家变更时，触发加入动画
-                if (newValue.username && newValue.username != oldValue?.username) {
+                if (newValue.username && newValue.username != oldValue?.username && newValue.gameStatus == 0) {
                     joinAnimate()
                 } else {
                     render()

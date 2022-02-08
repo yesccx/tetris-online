@@ -34,6 +34,7 @@
 
             const buildBlock = (type) => {
                 if (!type) {
+                    block.value = [...empty]
                     return
                 }
 

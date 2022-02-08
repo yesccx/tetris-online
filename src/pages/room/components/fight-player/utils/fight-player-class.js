@@ -41,7 +41,7 @@ class FightPlayerClass {
     nextBlock() {
         const $store = useStore()
 
-        if ($store.state.gameRoom.status != 1) {
+        if ($store.state.gameRoom.status != 1 || !this.username) {
             return ''
         }
         return $store.state.gameRoom.blocks?.[this.blockIndex] || ''

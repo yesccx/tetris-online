@@ -111,6 +111,8 @@ const utils = {
     },
 
     visibilityChangeEvent: (() => {
+        return false
+
         if (!hiddenProperty) {
             return false
         }

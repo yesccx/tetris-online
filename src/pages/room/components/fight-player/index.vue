@@ -10,7 +10,8 @@
             <div class="screen">
                 <div class="panel">
                     <!-- 矩阵/主界面 -->
-                    <Matrix :username="info.username" :prop-matrix="info.matrix" :cur="info.cur" />
+                    <Matrix :username="info.username" :prop-matrix="info.matrix" :cur="info.cur"
+                        :game-status="gameRoom.status" />
 
                     <!-- 恐龙Logo -->
                     <Logo :status="gameRoom.status != 1 && info.isReady" />

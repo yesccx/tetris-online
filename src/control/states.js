@@ -109,6 +109,10 @@ const states = {
                 return
             }
 
+            if (state.gameRoom?.pause == 1) {
+                return
+            }
+
             // 方块下落
             const next = cur.fall()
 
@@ -160,6 +164,11 @@ const states = {
 
         // 存在消除行时，暂时不释放一个方块(由matrix组件先做消除处理)
         if (isClear(matrix)) {
+            return
+        }
+
+        // 在暂停中时，暂时不释放下一个方块
+        if (store.state.gameRoom.pause) {
             return
         }
 

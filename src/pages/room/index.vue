@@ -16,11 +16,11 @@
     <MenuPopup v-model:show="menuShow" />
 
     <!-- 结算面板 -->
-    <SettlementPopup v-model:show="settlementShow" />
+    <SettlementPopup v-model:show="settlementShow" :data="settlementData" />
 </template>
 
 <script>
-    import { defineComponent, reactive, onMounted, computed, onUnmounted, toRefs, watch, nextTick } from 'vue'
+    import { defineComponent, reactive, onMounted, computed, onUnmounted, toRefs, watch, nextTick, provide } from 'vue'
     import { useStore } from 'vuex'
     import { useRoute, useRouter } from 'vue-router'
 
@@ -52,6 +52,7 @@
                 fightPlayerCss: { zoom: 1 },
                 menuShow: false,
                 settlementShow: false,
+                settlementData: [],
                 inited: false,
                 fightPlayerRefs: {}
             })
@@ -73,7 +74,6 @@
                 // 窗体大小自适应
                 window.addEventListener('resize', adaptiveScreenSize, true)
                 adaptiveScreenSize();
-
 
                 initRoomInfo(() => {
                     state.inited = true
@@ -115,6 +115,16 @@
                 $store.state.drop = false
                 $store.state.lock = false
                 music.bgmusic && music.bgmusic.stop()
+
+                if ($store.state.gameRoom.status == 0) {
+                    $wsClient.socket('/game').emit('leave-room', () => {
+                        $store.commit('quitGameRoom')
+                    })
+                } else {
+                    $wsClient.socket('/game').emit('player-offline', () => {
+                        $store.commit('quitGameRoom')
+                    })
+                }
             })
 
             // 初始化房间信息
@@ -157,6 +167,12 @@
                     flushMemberList();
                 });
 
+                // 用户离线
+                $wsClient.socket('/game')[type]('player-offline', type == 'off' ? undefined : (data) => {
+                    Toast(data + ' 已离线');
+                    flushMemberList();
+                });
+
                 // 用户准备状态更新
                 $wsClient.socket('/game')[type]('room-update', type == 'off' ? undefined : (data) => {
                     flushMemberList();
@@ -168,6 +184,7 @@
                     Dialog.alert({
                         title: '提示',
                         message: '房间已解散',
+                        ...(state.settlementShow ? { zIndex: 1000 } : {}),
                     }).then(() => {
                         $store.commit('quitGameRoom')
                         $router.push({ name: 'hall' })
@@ -188,6 +205,8 @@
                     setTimeout(() => {
                         Toast({ message: 'Go!!!', duration: 300 })
 
+                        $store.commit('lock', false)
+                        $store.commit('reset', false)
                         music.bgmusic && music.bgmusic.play()
                         states.start();
 
@@ -244,13 +263,9 @@
                     // 停止上报
                     autoReportFightData(false)
 
-                    loading()
-                    flushMemberList(() => {
-                        unloading()
-
-                        // 显示结算面板
-                        state.settlementShow = true
-                    })
+                    // 显示结算面板
+                    state.settlementData = data
+                    state.settlementShow = true
                 });
             }
 
@@ -313,6 +328,16 @@
                     state.fightPlayerRefs[el.info.username] = el
                 }
             }
+
+            // 重回游戏
+            provide('returnToGame', () => {
+                initRoomInfo(() => {
+                    state.inited = true
+
+                    // 初始化刷新成员列表
+                    flushMemberList()
+                })
+            })
 
             return {
                 ...toRefs(state),
