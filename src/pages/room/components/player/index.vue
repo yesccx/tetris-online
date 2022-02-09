@@ -3,7 +3,7 @@
         <div class="rect" :class="drop?'drop':''">
             <!-- Buffer -->
             <div class="buffer-container">
-                <Buffer :count="playerSurplusBuffers" :is-over="playerData.isOver" />
+                <Buffer :count="playerSurplusBuffers" :is-over="playerData.isOver" :game-status="gameRoom.status" />
             </div>
 
             <div class="screen">

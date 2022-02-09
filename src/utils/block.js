@@ -128,6 +128,7 @@ class Block {
         this.timeStamp = data?.[2] || 0
         this.shape = data?.[3] || []
         this.xy = data?.[4] || []
+        return this
     }
 }
 

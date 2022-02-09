@@ -21,6 +21,10 @@
             isOver: {
                 type: Boolean,
                 default: false
+            },
+            gameStatus: {
+                type: Number,
+                default: 0
             }
         },
         setup(props) {
@@ -30,7 +34,7 @@
 
             watch(() => props.count, (newValue, oldValue) => {
                 newValue = parseInt(newValue)
-                if (!props.isOver && newValue > oldValue) {
+                if (props.gameStatus == 1 && !props.isOver && newValue > oldValue) {
                     music.buffer && music.buffer.play()
                 }
             })
