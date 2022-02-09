@@ -170,7 +170,7 @@ const mutations = {
                 isOver: Boolean(info?.[10] || false),
                 isOnline: Boolean(info?.[11] || false),
                 isQuit: Boolean(info?.[12] || false),
-                cur: info?.[13] ? JSON.parse(info[13]) : null,
+                cur: (info?.[13] && info[13] != 'null') ? new Block().decode(JSON.parse(info[13])) : null,
                 team: info?.[14] || 1,
                 overTime: info?.[15] || 0,
             })
@@ -196,7 +196,7 @@ const mutations = {
                 isOver: Boolean(info?.[10] || false),
                 isOnline: Boolean(info?.[11] || false),
                 isQuit: Boolean(info?.[12] || false),
-                cur: info?.[13] ? JSON.parse(info[13]) : null,
+                cur: (info?.[13] && info[13] != 'null') ? new Block().decode(JSON.parse(info[13])) : null,
                 team: info?.[14] || 1,
                 overTime: info?.[15] || 0,
             })
