@@ -84,9 +84,9 @@ const getters = {
     playerBuffers(state, getters) {
         const players = state.gameRoomMembers.filter((player) => player.team != state.playerData.team);
         const value = players.reduce((previousValue, current) => {
-            return previousValue + (current?.clearLines || 0) * getters.clearLevel
+            return (previousValue + current?.clearLines || 0)
         }, 0);
-        return value
+        return value * getters.clearLevel
     },
     // playerSurplusBuffers
     playerSurplusBuffers(state, getters) {

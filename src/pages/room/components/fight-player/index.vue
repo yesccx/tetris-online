@@ -120,10 +120,10 @@
                 const info = props.info
                 const players = $store.state.gameRoomMembers.filter((player) => player.team != info.team);
                 const playerBuffers = players.reduce((previousValue, current) => {
-                    return previousValue + (current?.clearLines || 0) * $store.getters.clearLevel
+                    return previousValue + current?.clearLines || 0
                 }, 0);
 
-                return playerBuffers - info.dischargeBuffers - info.fillBuffers
+                return playerBuffers * $store.getters.clearLevel - info.dischargeBuffers - info.fillBuffers
             })
 
             // 显示消除行动画

@@ -1,10 +1,10 @@
 <template>
     <div class="buffer">
-        <div class="wrapper" :class="{fill: realCount >= 1}"></div>
-        <div class="wrapper" :class="{fill: realCount >= 2}"></div>
-        <div class="wrapper" :class="{fill: realCount >= 3}"></div>
-        <div class="wrapper" :class="{fill: realCount >= 4}"></div>
-        <div class="wrapper" :class="{fill: realCount >= 5}"></div>
+        <div class="wrapper" :class="{f50: realCount > 0 && realCount < 1, f100: realCount >= 1}"></div>
+        <div class="wrapper" :class="{f50: realCount > 1 && realCount < 2, f100: realCount >= 2}"></div>
+        <div class="wrapper" :class="{f50: realCount > 2 && realCount < 3, f100: realCount >= 3}"></div>
+        <div class="wrapper" :class="{f50: realCount > 3 && realCount < 4, f100: realCount >= 4}"></div>
+        <div class="wrapper" :class="{f50: realCount > 4 && realCount < 5, f100: realCount >= 5}"></div>
     </div>
 </template>
 
@@ -66,7 +66,11 @@
             border-radius: 8px;
             box-shadow: 0px 3px 6px rgb(0 0 0 / 80%) inset;
 
-            &.fill {
+            &.f50 {
+                background: linear-gradient(90deg, #de4d4d 50%, #fee94e 50%);
+                box-shadow: 0px -3px 6px rgb(0 0 0 / 80%) inset;
+            }
+            &.f100 {
                 background: #de4d4d;
                 box-shadow: 0px -3px 6px rgb(0 0 0 / 80%) inset;
             }

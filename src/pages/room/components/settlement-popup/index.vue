@@ -11,7 +11,7 @@
                     <span class=" text-gray-500 ml-2">第{{ Number(index) + 1 }}名 {{ player.username }}</span>
                 </template>
                 <PlayerInfo :team="player.team" :points="player.points" :block-index="player.block_index"
-                    :clear-lines="player.clearLines" :discharge-buffers="player.discharge_buffers" />
+                    :clear-lines="player.clear_lines" :discharge-buffers="player.discharge_buffers" />
             </van-collapse-item>
         </van-collapse>
     </van-dialog>

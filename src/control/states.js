@@ -253,12 +253,12 @@ const states = {
         states.dispatchPoints(addPoints)
 
         // 抵销buffers
-        if (store.getters.playerBuffers > 0) {
-            const afterDischargeBuffers = store.state.playerData.dischargeBuffers + currentClearLines * store.getters.clearLevel
-            const playerBuffers = store.getters.playerBuffers
+        if (store.getters.playerSurplusBuffers > 0) {
+            const dischargeBuffers = currentClearLines * store.getters.clearLevel
+            const playerSurplusBuffers = store.getters.playerSurplusBuffers
             store.commit(
                 'setPlayerDischargeBuffers',
-                Math.min(afterDischargeBuffers, playerBuffers)
+                store.state.playerData.dischargeBuffers + Math.min(playerSurplusBuffers, dischargeBuffers)
             )
         }
 
@@ -306,8 +306,8 @@ const states = {
     // 填充玩家剩余buffers
     fillPlayerSurplusBuffers: () => {
         const playerSurplusBuffers = parseInt(store.getters.playerSurplusBuffers)
-        const fillBuffers = store.state.playerData.fillBuffers
         if (playerSurplusBuffers > 0) {
+            const fillBuffers = store.state.playerData.fillBuffers
             store.commit('matrix', getBufferMatrix(store.state.playerData.matrix, playerSurplusBuffers))
             store.commit('setPlayerFillBuffers', fillBuffers + playerSurplusBuffers)
         }
