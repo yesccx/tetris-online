@@ -103,10 +103,11 @@ const mutations = {
         state.gameRoom.owner = owner;
         state.gameRoom.status = status;
         state.gameRoom.pause = Boolean(pause);
-        state.gameRoom.blocks = blocks;
         state.gameRoom.speedStart = speed_start;
         state.gameRoom.startLines = start_lines;
         state.gameRoom.mode = mode;
+
+        this.commit('setGameRoomBlocks', blocks)
 
         // 初始化房间成员
         this.commit('initGameRoomMembers', members);
@@ -137,7 +138,7 @@ const mutations = {
         state.playerData.isReady = Boolean(data?.is_ready || 0)
         state.playerData.isOver = Boolean(data?.is_over || 0)
         state.playerData.blockIndex = data?.block_index || 0
-        state.playerData.cur = (data?.cur && data.cur != 'null') ? new Block(JSON.parse(data.cur)) : null
+        state.playerData.cur = (data?.cur && data.cur != 'null') ? new Block().decode(JSON.parse(data.cur)) : null
         state.playerData.dischargeBuffers = data?.discharge_buffers || 0
         state.playerData.fillBuffers = data?.fill_buffers || 0
         state.playerData.speedRun = data?.speed_run || 1
@@ -209,7 +210,15 @@ const mutations = {
     },
     // 设置当前房间blocks
     setGameRoomBlocks(state, blocks) {
-        state.gameRoom.blocks = blocks
+        if (Array.isArray(blocks) && blocks.length > 0) {
+            let retBlocks = []
+            for (let i = 0; i < 10; i++) {
+                retBlocks = retBlocks.concat(blocks)
+            }
+            state.gameRoom.blocks = retBlocks
+        } else {
+            state.gameRoom.blocks = blocks
+        }
     },
     // 设置当前房间配置
     setGameRoomSettings(state, data) {

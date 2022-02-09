@@ -29,6 +29,7 @@
 
     import { wsClient as $wsClient } from '@/utils/websocket'
     import { loading, unloading } from '@/utils/common'
+    import { unzip } from '@/utils/gzip';
 
     export default defineComponent({
         components: {
@@ -78,7 +79,8 @@
             // 刷新房间列表
             const flushRoomList = () => {
                 state.roomListLoading = true;
-                $wsClient.socket('/game').emit('room-list', (data) => {
+                $wsClient.socket('/game').emit('room-list', (rawData) => {
+                    const data = unzip(rawData)
                     state.roomListLoading = false;
                     state.roomList = data.data;
                 });

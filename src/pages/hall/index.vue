@@ -24,6 +24,7 @@
     import { Dialog, Toast } from 'vant';
     import { loading, unloading } from '@/utils/common';
     import { useRouter } from 'vue-router';
+    import { unzip } from '@/utils/gzip';
 
     export default defineComponent({
         name: 'page-hall',
@@ -54,7 +55,8 @@
             // 检测上一个房间
             const checkLastRoom = () => {
                 loading()
-                $wsClient.socket('/game').emit('room-info', (data) => {
+                $wsClient.socket('/game').emit('room-info', (rawData) => {
+                    const data = unzip(rawData)
                     unloading()
                     if (data.success && data.data.status == 1) {
                         const roomNumber = data.data.number

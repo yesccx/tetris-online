@@ -87,6 +87,9 @@ const states = {
         store.commit('matrix', startMatrix)
         store.commit('autoMoveBlock')
         store.commit('prepareNextBlock')
+        store.commit('reset', false)
+        store.commit('drop', false)
+        store.commit('lock', false)
         states.auto()
     },
 
@@ -209,7 +212,18 @@ const states = {
             clearTimeout(states.fallInterval)
             return
         }
+
+        if (store.state.playerData.cur == null) {
+            store.commit('autoMoveBlock')
+            store.commit('prepareNextBlock', '')
+        }
+
         states.auto()
+    },
+
+    // 上报锁定
+    reportLock(satus) {
+
     },
 
     // 消除行
@@ -270,6 +284,7 @@ const states = {
     // 游戏结束
     gameOver: () => {
         store.commit('setPlayerOverStatus', true)
+        store.commit('lock', false)
         clearTimeout(states.fallInterval)
     },
 

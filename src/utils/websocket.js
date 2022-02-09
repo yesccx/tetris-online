@@ -6,7 +6,7 @@ let wsClient = null;
 const init = () => {
     const $store = useStore();
 
-    wsClient = new Manager('http://192.168.2.112:8992', {
+    wsClient = new Manager(import.meta.env.VITE_WS_HOST, {
         autoConnect: true,
         transports: ['websocket'],
         upgrade: false,

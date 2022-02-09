@@ -113,9 +113,9 @@
 
                 socketListen('off')
 
-                $store.state.reset = false
-                $store.state.drop = false
-                $store.state.lock = false
+                $store.commit('reset', false)
+                $store.commit('drop', false)
+                $store.commit('lock', false)
                 music.bgmusic && music.bgmusic.stop()
 
                 if ($store.state.gameRoom.status == 0) {
@@ -140,7 +140,8 @@
 
                 // 获取房间信息
                 loading()
-                $wsClient.socket('/game').emit('room-info', (data) => {
+                $wsClient.socket('/game').emit('room-info', (rawData) => {
+                    const data = unzip(rawData)
                     unloading()
                     if (!data.success) {
                         return Dialog.alert({ title: '提示', message: data.message }).then(() => {
@@ -199,7 +200,8 @@
                 });
 
                 // 游戏开始
-                $wsClient.socket('/game')[type]('game-start', type == 'off' ? undefined : (data) => {
+                $wsClient.socket('/game')[type]('game-start', type == 'off' ? undefined : (rawData) => {
+                    const data = unzip(rawData)
                     music.start.play()
                     $store.commit('setGameRoomStatus', 1);
                     $store.commit('setGameRoomBlocks', data.blocks);
@@ -289,28 +291,37 @@
             // 定时自动上报对战信息
             let reportInterval = 0;
             const autoReportFightData = (status = false) => {
-                const playerData = $store.state.playerData;
                 clearInterval(reportInterval);
                 reportInterval = null
 
                 if (status == true) {
+                    const playerData = $store.state.playerData;
                     reportInterval = setInterval(() => {
-                        $wsClient.socket('/game').emit('game-data-report', zip([
-                            playerData.points,
-                            playerData.isOwner ? 1 : 0,
-                            playerData.isReady ? 1 : 0,
-                            playerData.isOver ? 1 : 0,
-                            playerData.blockIndex,
-                            JSON.stringify(playerData.cur),
-                            playerData.speedRun,
-                            playerData.clearLines,
-                            JSON.stringify(playerData.matrix),
-                            playerData.dischargeBuffers,
-                            playerData.fillBuffers,
-                        ]));
+                        if ($store.state.lock) {
+                            return
+                        }
+                        reportHanlder(playerData)
                         flushMemberList();
-                    }, 60);
+                    }, 65);
                 }
+            }
+
+            // 上报处理
+            const reportHanlder = (playerData) => {
+                playerData = playerData || $store.state.playerData;
+                $wsClient.socket('/game').emit('game-data-report', zip([
+                    playerData.points,
+                    playerData.isOwner ? 1 : 0,
+                    playerData.isReady ? 1 : 0,
+                    playerData.isOver ? 1 : 0,
+                    playerData.blockIndex,
+                    !playerData.cur ? JSON.stringify(playerData.cur) : playerData.cur.encode(),
+                    playerData.speedRun,
+                    playerData.clearLines,
+                    JSON.stringify(playerData.matrix),
+                    playerData.dischargeBuffers,
+                    playerData.fillBuffers,
+                ]));
             }
 
             // 刷新成员列表

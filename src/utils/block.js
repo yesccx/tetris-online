@@ -2,6 +2,10 @@ import { blockShape, origin } from './constant'
 
 class Block {
     constructor(option) {
+        if (option === undefined) {
+            return
+        }
+
         this.type = option.type
 
         if (!option.rotateIndex) {
@@ -108,6 +112,22 @@ class Block {
             rotateIndex: this.rotateIndex,
             timeStamp: this.timeStamp
         }
+    }
+    encode() {
+        return JSON.stringify([
+            this?.type || '',
+            this?.rotateIndex || 0,
+            this?.timeStamp || 0,
+            this?.shape || [],
+            this?.xy || []
+        ])
+    }
+    decode(data) {
+        this.type = data?.[0] || ''
+        this.rotateIndex = data?.[1] || 0
+        this.timeStamp = data?.[2] || 0
+        this.shape = data?.[3] || []
+        this.xy = data?.[4] || []
     }
 }
 
