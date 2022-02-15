@@ -1,10 +1,17 @@
 import Block from '@/utils/block'
 import FightPlayerClass from '@/pages/room/components/fight-player/utils/fight-player-class'
-import { blankMatrix } from '@/utils/constant'
+import { blankMatrix, eachLines } from '@/utils/constant'
 import states from '@/control/states'
 
 const mutations = {
     prepareNextBlock(state) {
+        // 积分模式时，下落速度会增加(最高7级)
+        if (state.gameRoom.mode == 1) {
+            const speedAdd = Math.floor(state.playerData.blockIndex / eachLines)
+            const speedNow = Math.min(state.gameRoom.speedStart + speedAdd, 7)
+            this.commit('speedRun', speedNow)
+        }
+
         states.fillPlayerSurplusBuffers()
         state.playerData.blockIndex++
     },
@@ -94,7 +101,7 @@ const mutations = {
         start_lines = 0,
         userinfo = {},
         members = [],
-        mode = 1,
+        mode = 2,
     }) {
         // 房间信息
         state.gameRoom.number = number;

@@ -10,7 +10,7 @@
                     <template #input>
                         <van-radio-group v-model="mode" direction="horizontal" :disabled="!gameRoomSetting"
                             @change="onSettingsChange">
-                            <van-radio :name="1" disabled>积分</van-radio>
+                            <van-radio :name="1">积分</van-radio>
                             <van-radio :name="2">生存</van-radio>
                         </van-radio-group>
                     </template>
@@ -20,7 +20,7 @@
                         <van-icon name="fire" /> 初始速度
                     </template>
                     <template #input>
-                        <van-slider v-model="speed" :min="1" :max="6" :disabled="!gameRoomSetting"
+                        <van-slider v-model="speed" :min="1" :max="7" :disabled="!gameRoomSetting"
                             @change="onSettingsChange">
                             <template #button>
                                 <div class="van-slider__button text-center text-gray-500">{{ speed }}</div>
@@ -95,14 +95,14 @@
     import { useStore } from 'vuex'
     import { useRouter } from 'vue-router'
 
-    import { Form, Field, Slider, Radio, ActionSheet, RadioGroup, Divider, Switch, Button, Icon, Dialog } from 'vant'
+    import { Form, Field, Slider, Radio, ActionSheet, RadioGroup, Divider, Switch, Button, Icon, Dialog, Toast } from 'vant'
 
     import { wsClient as $wsClient } from '@/utils/websocket'
     import { loading, unloading } from '@/utils/common'
 
     import keyboardLayout from '../player/keyboard/layout';
     import { music } from '@/utils/music'
-    import _ from 'loadsh'
+    import _ from 'lodash'
 
     export default {
         components: {
@@ -178,6 +178,12 @@
             }, {
                 deep: true,
                 immediate: true
+            })
+            // 游戏模式变更提示
+            watch(() => $store.state.gameRoom.mode, (data, oldData) => {
+                if (oldData && data != oldData) {
+                    Toast('游戏模式变更为：' + (data == 1 ? '积分' : '生存'))
+                }
             })
 
             onMounted(() => {

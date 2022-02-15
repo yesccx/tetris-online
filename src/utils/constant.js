@@ -23,13 +23,14 @@ export const origin = {
 export const blockType = Object.keys(blockShape)
 
 // 速度
-export const speeds = [800, 650, 500, 370, 250, 160]
+export const speeds = [800, 650, 500, 370, 250, 160, 120]
 
 // 每消除eachLines行, 增加速度
-export const eachLines = 20
+export const eachLines = 30
 
 // 延迟
-export const delays = [50, 60, 70, 80, 90, 100]
+// export const delays = [110, 100, 90, 80, 70, 60, 50]
+export const delays = [70, 70, 70, 70, 70, 70, 70]
 
 // 一行填满的状态
 export const fillLine = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
@@ -47,7 +48,7 @@ export const blankMatrix = (() => {
 })()
 
 // 消除行后的分数
-export const clearPoints = [100, 300, 700, 1500]
+export const clearPoints = [100, 300, 600, 1100]
 
 // 缓存key值
 export const StorageKey = 'VUE3_TETRIS'

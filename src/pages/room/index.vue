@@ -56,7 +56,9 @@
                 settlementShow: false,
                 settlementData: [],
                 inited: false,
-                fightPlayerRefs: {}
+                fightPlayerRefs: {},
+                reportLock: false,
+                reportFinal: false
             })
 
             // 对战玩家列表
@@ -239,19 +241,21 @@
                 $wsClient.socket('/game')[type]('game-block-clear', type == 'off' ? undefined : (data) => {
                     const currentClearLines = data.lines
                     const username = data.username
-                    const $el = state.fightPlayerRefs[username] || null
-                    if ($el) {
-                        $el.clearPlay(currentClearLines)
-                    }
+                    if (username != $store.state.userSession.username) {
+                        const $el = state.fightPlayerRefs[username] || null
+                        if ($el) {
+                            $el.clearPlay(currentClearLines)
+                        }
 
-                    if (currentClearLines == 1) {
-                        music.clear1 && music.clear1.play()
-                    } else if (currentClearLines == 2) {
-                        music.clear2 && music.clear2.play()
-                    } else if (currentClearLines == 3) {
-                        music.clear3 && music.clear3.play()
-                    } else if (currentClearLines == 4) {
-                        music.clear4 && music.clear4.play()
+                        if (currentClearLines == 1) {
+                            music.clear1 && music.clear1.play()
+                        } else if (currentClearLines == 2) {
+                            music.clear2 && music.clear2.play()
+                        } else if (currentClearLines == 3) {
+                            music.clear3 && music.clear3.play()
+                        } else if (currentClearLines == 4) {
+                            music.clear4 && music.clear4.play()
+                        }
                     }
                 });
 
@@ -296,10 +300,10 @@
 
                 if (status == true) {
                     const playerData = $store.state.playerData;
+                    state.reportLock = false
+                    state.reportFinal = false
+
                     reportInterval = setInterval(() => {
-                        if ($store.state.lock) {
-                            return
-                        }
                         reportHanlder(playerData)
                         flushMemberList();
                     }, 65);
@@ -308,6 +312,18 @@
 
             // 上报处理
             const reportHanlder = (playerData) => {
+                // 数据正在处理中
+                if ($store.state.lock) {
+                    return
+                }
+
+                // 满足一定条件时停止上报
+                if (state.reportLock || state.reportFinal) {
+                    return
+                }
+                // 节流控制
+                state.reportLock = true
+
                 playerData = playerData || $store.state.playerData;
                 $wsClient.socket('/game').emit('game-data-report', zip([
                     playerData.points,
@@ -321,7 +337,14 @@
                     JSON.stringify(playerData.matrix),
                     playerData.dischargeBuffers,
                     playerData.fillBuffers,
-                ]));
+                ]), () => {
+                    state.reportLock = false
+
+                    // 标记已结束，不需要再上报
+                    if (playerData.isOver) {
+                        state.reportFinal = true
+                    }
+                });
             }
 
             // 刷新成员列表

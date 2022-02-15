@@ -3,7 +3,9 @@
         <div class="rect" :class="drop?'drop':''">
             <!-- Buffer -->
             <div class="buffer-container">
-                <Buffer :count="playerSurplusBuffers" :is-over="playerData.isOver" :game-status="gameRoom.status" />
+                <Buffer v-if="gameRoom.mode == 2" :count="playerSurplusBuffers" :is-over="playerData.isOver"
+                    :game-status="gameRoom.status" />
+                <Proportion v-else :members="gameRoomMembers" />
             </div>
 
             <div class="screen">
@@ -65,6 +67,7 @@
     import Pause from './pause/index.vue'
     import Point from './point/index.vue'
     import Buffer from './buffer/index.vue'
+    import Proportion from './proportion/index.vue'
     import Username from './username/index.vue'
 
     import { Progress } from 'vant'
@@ -80,6 +83,7 @@
             Pause,
             Point,
             Buffer,
+            Proportion,
             Username,
             [Progress.name]: Progress
         },
@@ -96,6 +100,9 @@
 
             // 游戏玩家
             const playerData = computed(() => $store.state.playerData)
+
+            // 游戏玩家
+            const gameRoomMembers = computed(() => $store.state.gameRoomMembers)
 
             // 下一个方块
             const nextBlock = computed(() => {
@@ -202,6 +209,7 @@
                 ...toRefs(state),
                 nextBlock,
                 gameRoom,
+                gameRoomMembers,
                 playerData,
                 logoManager,
                 playerSurplusBuffers,

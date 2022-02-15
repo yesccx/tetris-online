@@ -14,7 +14,7 @@
                         :game-status="gameRoom.status" />
 
                     <!-- 恐龙Logo -->
-                    <Logo :status="gameRoom.status != 1 && info.isReady" />
+                    <Logo :status="gameRoom.status != 1 && info.isReady && !info.isOver && !info.points" />
 
                     <div class="state">
                         <!-- 计分 -->
@@ -113,10 +113,15 @@
             const gameRoom = computed(() => $store.state.gameRoom)
 
             // 游戏速度(未开始时，显示初始数度)
-            const gammeSpeed = computed(() => props.info.cur ? props.info.speedRun : gameRoom.speedStart)
+            const gammeSpeed = computed(() => props.info.cur ? props.info.speedRun : gameRoom.value.speedStart)
 
             // playerSurplusBuffers
             const playerSurplusBuffers = computed(() => {
+                // 积分模式不累计buffer
+                if (gameRoom.value.mode == 1) {
+                    return 0
+                }
+
                 const info = props.info
                 const players = $store.state.gameRoomMembers.filter((player) => player.team != info.team);
                 const playerBuffers = players.reduce((previousValue, current) => {

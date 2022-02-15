@@ -21,6 +21,14 @@
                 <span class="column-name">抵消行：</span>
                 <span class="column-value">{{ dischargeBuffers }}</span>
             </li>
+            <li class="data-wrapper">
+                <span class="column-name">下落速度：</span>
+                <span class="column-value">{{ speedRun !== '' ? (speedRun + '级') : '' }}</span>
+            </li>
+            <li class="data-wrapper">
+                <span class="column-name">生存时间：</span>
+                <span class="column-value">{{ durationTime }}</span>
+            </li>
         </ul>
     </div>
 </template>
@@ -49,6 +57,13 @@
             dischargeBuffers: {
                 type: Number,
                 default: 0
+            },
+            durationTime: {
+                type: String,
+                default: '-'
+            },
+            speedRun: {
+                default: ''
             }
         },
         setup(props) {

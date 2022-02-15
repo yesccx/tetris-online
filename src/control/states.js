@@ -267,11 +267,6 @@ const states = {
         store.commit('prepareNextBlock', '')
         states.auto()
         store.commit('lock', false)
-
-        // const speedAdd = Math.floor(clearLines / eachLines) // 消除行数, 增加对应速度
-        // let speedNow = state.speedStart + speedAdd
-        // speedNow = speedNow > 6 ? 6 : speedNow
-        // store.commit('speedRun', speedNow)
     },
 
     // 游戏结束, 触发动画

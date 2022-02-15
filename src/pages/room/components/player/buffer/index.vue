@@ -40,7 +40,7 @@
             })
 
             watch(() => props.count, (newValue, oldValue) => {
-                if (!props.isOver) {
+                if (props.gameStatus == 1 && !props.isOver) {
                     state.realCount = newValue
                 }
             }, {

@@ -44,7 +44,7 @@ const state = {
         blocks: [],
         speedStart: 1,
         startLines: 0,
-        mode: 1
+        mode: 2
     },
 
     // 当前游戏房间成员
@@ -82,6 +82,11 @@ const getters = {
     },
     // playerBuffers
     playerBuffers(state, getters) {
+        // 积分模式不累计buffer
+        if (state.gameRoom.mode == 1) {
+            return 0
+        }
+
         const players = state.gameRoomMembers.filter((player) => player.team != state.playerData.team);
         const value = players.reduce((previousValue, current) => {
             return (previousValue + current?.clearLines || 0)
