@@ -1,3 +1,4 @@
+import { watch } from 'vue'
 import { blockType, StorageKey } from './constant'
 const hiddenProperty = (() => {
     // document[hiddenProperty] 可以判断页面是否失焦
@@ -69,6 +70,18 @@ const utils = {
     },
     // 订阅store userSetting
     subscribeStoreUserSetting(store) {
+        // 开启订阅 (保存至localStorage)
+        watch(() => store.state.userSetting, (rawData) => {
+            let data = JSON.stringify(rawData)
+            data = encodeURIComponent(data)
+            if (window.btoa) {
+                data = window.btoa(data)
+            }
+            window.localStorage.setItem(StorageKey, data)
+        }, {
+            deep: true
+        })
+
         // 还原
         let data = window.localStorage.getItem(StorageKey)
         if (!data) {
@@ -76,7 +89,7 @@ const utils = {
         }
         try {
             if (window.btoa) {
-                data = atob(data)
+                data = window.atob(data)
             }
             data = decodeURIComponent(data)
             data = JSON.parse(data)
@@ -88,16 +101,6 @@ const utils = {
             }
             return null
         }
-
-        // 开启订阅 (保存至localStorage)
-        store.subscribe((_, state) => {
-            let data = JSON.stringify(state.userSetting)
-            data = encodeURIComponent(data)
-            if (window.btoa) {
-                data = btoa(data)
-            }
-            window.localStorage.setItem(StorageKey, data)
-        })
     },
 
     isMobile() {

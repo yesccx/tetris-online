@@ -4,7 +4,7 @@ import { blankMatrix, eachLines } from '@/utils/constant'
 import states from '@/control/states'
 
 const mutations = {
-    prepareNextBlock(state) {
+    async prepareNextBlock(state, callback) {
         // 积分模式时，下落速度会增加(最高7级)
         if (state.gameRoom.mode == 1) {
             const speedAdd = Math.floor(state.playerData.blockIndex / eachLines)
@@ -12,8 +12,10 @@ const mutations = {
             this.commit('speedRun', speedNow)
         }
 
-        states.fillPlayerSurplusBuffers()
+        await states.fillPlayerSurplusBuffers()
         state.playerData.blockIndex++
+
+        callback && callback()
     },
     autoMoveBlock(state, getters) {
         this.commit('moveBlock', {

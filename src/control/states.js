@@ -10,6 +10,12 @@ import {
 import { music } from '@/utils/music'
 import { wsClient as $wsClient } from '@/utils/websocket'
 
+const sleep = (delay) => {
+    return new Promise((resolve) => {
+        setTimeout(resolve, delay)
+    })
+}
+
 const getStartMatrix = startLines => {
     // 生成startLines
     const getLine = (min, max) => {
@@ -86,11 +92,12 @@ const states = {
         const startMatrix = getStartMatrix(startLines)
         store.commit('matrix', startMatrix)
         store.commit('autoMoveBlock')
-        store.commit('prepareNextBlock')
-        store.commit('reset', false)
-        store.commit('drop', false)
-        store.commit('lock', false)
-        states.auto()
+        store.commit('prepareNextBlock', () => {
+            store.commit('reset', false)
+            store.commit('drop', false)
+            store.commit('lock', false)
+            states.auto()
+        })
     },
 
     // 自动下落
@@ -187,8 +194,9 @@ const states = {
             store.commit('moveBlock', {
                 type: store.state.gameRoom.blocks[store.state.playerData.blockIndex] || ''
             })
-            store.commit('prepareNextBlock')
-            states.auto()
+            store.commit('prepareNextBlock', () => {
+                states.auto()
+            })
         }, 100)
     },
 
@@ -215,10 +223,12 @@ const states = {
 
         if (store.state.playerData.cur == null) {
             store.commit('autoMoveBlock')
-            store.commit('prepareNextBlock', '')
+            store.commit('prepareNextBlock', () => {
+                states.auto()
+            })
+        } else {
+            states.auto()
         }
-
-        states.auto()
     },
 
     // 上报锁定
@@ -264,9 +274,10 @@ const states = {
 
         store.commit('matrix', newMatrix)
         store.commit('autoMoveBlock')
-        store.commit('prepareNextBlock', '')
-        states.auto()
-        store.commit('lock', false)
+        store.commit('prepareNextBlock', () => {
+            states.auto()
+            store.commit('lock', false)
+        })
     },
 
     // 游戏结束, 触发动画
@@ -299,12 +310,15 @@ const states = {
     getStartMatrix,
     getBufferMatrix,
     // 填充玩家剩余buffers
-    fillPlayerSurplusBuffers: () => {
+    fillPlayerSurplusBuffers: async () => {
         const playerSurplusBuffers = parseInt(store.getters.playerSurplusBuffers)
         if (playerSurplusBuffers > 0) {
-            const fillBuffers = store.state.playerData.fillBuffers
-            store.commit('matrix', getBufferMatrix(store.state.playerData.matrix, playerSurplusBuffers))
-            store.commit('setPlayerFillBuffers', fillBuffers + playerSurplusBuffers)
+            for (let index = 1; index <= playerSurplusBuffers; index++) {
+                await sleep(index * 15)
+                const fillBuffers = store.state.playerData.fillBuffers
+                store.commit('matrix', getBufferMatrix(store.state.playerData.matrix, 1))
+                store.commit('setPlayerFillBuffers', fillBuffers + 1)
+            }
         }
     }
 }
