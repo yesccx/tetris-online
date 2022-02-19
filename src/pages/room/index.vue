@@ -36,6 +36,7 @@
     import { music } from '@/utils/music'
 
     import { unzip, zip } from '@/utils/gzip'
+    import Block from '@/utils/block'
 
     export default defineComponent({
         name: 'page-room',
@@ -324,24 +325,24 @@
                 // 节流控制
                 state.reportLock = true
 
-                playerData = playerData || $store.state.playerData;
+                const data = JSON.parse(JSON.stringify(playerData || $store.state.playerData));
                 $wsClient.socket('/game').emit('game-data-report', zip([
-                    playerData.points,
-                    playerData.isOwner ? 1 : 0,
-                    playerData.isReady ? 1 : 0,
-                    playerData.isOver ? 1 : 0,
-                    playerData.blockIndex,
-                    !playerData.cur ? JSON.stringify(playerData.cur) : playerData.cur.encode(),
-                    playerData.speedRun,
-                    playerData.clearLines,
-                    JSON.stringify(playerData.matrix),
-                    playerData.dischargeBuffers,
-                    playerData.fillBuffers,
+                    data.points,
+                    data.isOwner ? 1 : 0,
+                    data.isReady ? 1 : 0,
+                    data.isOver ? 1 : 0,
+                    data.blockIndex,
+                    !data.cur ? JSON.stringify(data.cur) : new Block(data.cur).encode(),
+                    data.speedRun,
+                    data.clearLines,
+                    JSON.stringify(data.matrix),
+                    data.dischargeBuffers,
+                    data.fillBuffers,
                 ]), () => {
                     state.reportLock = false
 
                     // 标记已结束，不需要再上报
-                    if (playerData.isOver) {
+                    if (data.isOver) {
                         state.reportFinal = true
                     }
                 });

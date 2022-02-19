@@ -21,6 +21,11 @@ const down = store => {
                 return
             }
 
+            // 游戏已结束
+            if (state.playerData.isOver) {
+                return
+            }
+
             // 当前不存在方块时不允许操作
             const cur = state.playerData.cur
             if (cur === null) {
